@@ -17,104 +17,171 @@ const PARTNER_DEFAULTS = [
 ];
 function loadPartners(){
   try{const s=localStorage.getItem('looper_partners');if(s)return JSON.parse(s);}catch(e){}
-  return PARTNER_DEFAULTS.map(p=>({...p,photo:null}));
+  return PARTNER_DEFAULTS.slice(0,10).map(p=>({...p,photo:null}));
 }
 function savePartners(arr){
   try{localStorage.setItem('looper_partners',JSON.stringify(arr));}catch(e){}
 }
-let partners = loadPartners();
+let partners = loadPartners().slice(0,10);
 
 /* ── Image config (set in js/config.js when running as a project; empty here) ── */
-const LOOPER_CFG = window.LOOPER_CONFIG || {heroCards:[],services:[]};
+const LOOPER_CFG = window.LOOPER_CONFIG || {heroCards:[],services:[],partners:[],cardBack:'',showUploader:true};
+const pmOpenBtn = document.getElementById('pmOpen'); if(pmOpenBtn && LOOPER_CFG.showUploader===false) pmOpenBtn.hidden = true;
+
+/* shared helper: shrink uploads so they fit in localStorage */
+function fileToDataUrl(file, maxSide, cb){
+  const fr = new FileReader();
+  fr.onload = ev => {
+    const im = new Image();
+    im.onload = () => {
+      const k = Math.min(1, maxSide/Math.max(im.width, im.height));
+      const c = document.createElement('canvas');
+      c.width = Math.round(im.width*k); c.height = Math.round(im.height*k);
+      c.getContext('2d').drawImage(im,0,0,c.width,c.height);
+      cb(c.toDataURL('image/jpeg',0.86));
+    };
+    im.onerror = () => cb(ev.target.result);
+    im.src = ev.target.result;
+  };
+  fr.readAsDataURL(file);
+}
+/* back-of-card image: config file wins over a browser upload */
+let cardBackUrl = '';
+try{ cardBackUrl = localStorage.getItem('looper_card_back') || ''; }catch(e){}
 // Photos listed in config win over anything saved in the browser
 partners.forEach((p,i)=>{ const src = (LOOPER_CFG.heroCards||[])[i]; if(src) p.photo = src; });
 
 /* ═══════════════════════════════════════════════════════════
-   LOADER
+   LOADER — one glowing infinity line draws itself (0→100%),
+   then the camera dives into the right-hand lobe; the lobe's
+   interior is a window onto the home page.
 ═══════════════════════════════════════════════════════════ */
 (function(){
-  const paths = document.querySelectorAll('#loader-logo path');
-  const pct   = document.getElementById('loaderPct');
-  const bar   = document.getElementById('loaderBar');
-  const barW  = document.getElementById('loaderBarWrap');
-  const txt   = document.getElementById('loaderText');
-  paths.forEach(p=>{
-    const len = p.getTotalLength ? p.getTotalLength() : 600;
-    p.style.strokeDasharray = len;
-    p.style.strokeDashoffset = len;
-  });
-  pct.classList.add('vis');
-  barW.classList.add('vis');
-  let progress=0;
-  const totalMs=2200, startTime=performance.now();
-  function step(now){
-    const elapsed=now-startTime;
-    progress=Math.min(elapsed/totalMs,1);
-    const eased=progress<.5?2*progress*progress:1-Math.pow(-2*progress+2,2)/2;
-    pct.innerHTML=Math.round(eased*100)+'<span style="font-size:.5em;opacity:.4">%</span>';
-    bar.style.width=(eased*100)+'%';
-    paths.forEach(p=>{
-      const len=parseFloat(p.style.strokeDasharray)||600;
-      p.style.strokeDashoffset=len*(1-eased);
-      p.style.transition='none';
-    });
-    if(eased>0.7) txt.setAttribute('opacity',((eased-0.7)/0.3).toFixed(2));
-    if(progress<1) requestAnimationFrame(step);
-    else setTimeout(startZoomTransition,350);
+  const loader = document.getElementById('loader');
+  const canvas = document.getElementById('loaderCanvas');
+  const pctEl  = document.getElementById('loaderPct');
+  const ctx    = canvas.getContext('2d');
+  if(!loader || !ctx) return;
+  const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion:reduce)').matches;
+  let W=0,H=0,dpr=1,A=200,cx=0,cy=0;
+  function resize(){
+    dpr=Math.min(window.devicePixelRatio||1,2);
+    W=window.innerWidth;H=window.innerHeight;
+    canvas.width=Math.round(W*dpr);canvas.height=Math.round(H*dpr);
+    A=Math.min(W*0.30,330);cx=W/2;cy=H/2-Math.min(24,H*0.03);
   }
-  requestAnimationFrame(step);
-})();
+  resize();window.addEventListener('resize',resize);
 
-/* ═══════════════════════════════════════════════════════════
-   ZOOM TRANSITION
-═══════════════════════════════════════════════════════════ */
-function startZoomTransition(){
-  const overlay = document.getElementById('zoomOverlay');
-  const canvas  = document.getElementById('zoomCanvas');
-  const ctx     = canvas.getContext('2d');
-  const loader  = document.getElementById('loader');
-  overlay.classList.add('active');
-  let W,H;
-  function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
-  resize();
-  loader.style.opacity='0'; loader.style.transition='opacity .3s';
-  const startMs=performance.now(), duration=900;
-  function drawZoomFrame(now){
-    const t=Math.min((now-startMs)/duration,1);
-    const ease=1-Math.pow(1-t,2.5);
-    ctx.clearRect(0,0,W,H);
-    const bgAlpha=t<0.7?1:1-((t-0.7)/0.3);
-    ctx.fillStyle=`rgba(0,0,0,${bgAlpha})`;ctx.fillRect(0,0,W,H);
-    const cx=W/2,cy=H/2;
-    const scale=0.08+ease*1.8;
-    const A=Math.min(W,H)*0.32*scale, B=Math.min(W,H)*0.14*scale;
-    ctx.save();
-    ctx.lineWidth=4+ease*20;ctx.lineCap='round';
-    ctx.strokeStyle=`rgba(0,102,255,${0.9-ease*0.5})`;
+  /* lemniscate, starting at the centre crossing and travelling into the right lobe first */
+  const N=360, K=0.95;
+  const pts=[];
+  for(let i=0;i<=N;i++){
+    const t=Math.PI/2 - (i/N)*Math.PI*2;          // π/2 → −3π/2  (centre → right lobe → centre → left lobe → centre)
+    const s=Math.sin(t),c=Math.cos(t),d=1+s*s;
+    pts.push([c/d,K*(s*c/d)]);                    // unit space (scaled by A when drawn)
+  }
+  // lobe centre in unit space (centroid of right lobe)
+  const LOBE_X=0.56;
+
+  function strokePath(upTo,lw,style,blur,glow){
+    const n=Math.max(2,Math.floor(upTo*N));
     ctx.beginPath();
-    for(let i=0;i<=300;i++){
-      const theta=(i/300)*Math.PI*2,s=Math.sin(theta),c=Math.cos(theta),d=1+s*s;
-      const x=cx+A*c/d,y=cy+B*s*c/d;
-      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    for(let i=0;i<=n;i++){
+      const p=pts[i];
+      i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]);
     }
-    ctx.closePath();ctx.stroke();
-    if(t>0.75){
-      const rt=(t-0.75)/0.25;
-      ctx.beginPath();ctx.arc(cx,cy,Math.max(W,H)*rt*1.5,0,Math.PI*2);
-      ctx.strokeStyle=`rgba(255,255,255,${0.3*(1-rt)})`;
-      ctx.lineWidth=60*(1-rt);ctx.stroke();
+    ctx.lineWidth=lw;ctx.strokeStyle=style;ctx.shadowBlur=blur;ctx.shadowColor=glow;
+    ctx.stroke();
+  }
+
+  function frame(draw,prog,zoomT){
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);
+    // camera: translate so the chosen lobe centre moves to the screen centre as we zoom
+    const Smax=Math.max(W,H)/A*1.15*9;               // plenty to swallow the screen
+    const S=Math.exp(Math.log(Smax)*zoomT);          // 1 → Smax, exponential = constant-speed dolly
+    const pan=zoomT;                                 // 0 → 1
+    const ox=cx - LOBE_X*A*pan*S;                   // pan toward lobe centre
+    ctx.save();
+    ctx.translate(ox, cy+(H/2-cy)*pan);
+    ctx.scale(A*S,A*S);
+    const px=1/(A*S);                                // one screen pixel in local units
+    ctx.lineJoin='round';ctx.lineCap='round';
+
+    // zoom: punch a lobe-shaped window through the black so the home page shows through
+    if(zoomT>0){
+      ctx.save();
+      ctx.globalCompositeOperation='destination-out';
+      ctx.shadowBlur=0;
+      ctx.beginPath();
+      // right lobe = points from centre (i=0) round to centre (i=N/2)
+      for(let i=0;i<=N/2;i++){const p=pts[i];i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]);}
+      ctx.closePath();ctx.fill();
+      ctx.restore();
+    }
+
+    // faint full track
+    const wBase=Math.max(2.5,Math.min(5,W*0.004));
+    const lwScreen=wBase*Math.pow(S,0.55)*(1-zoomT*0.35);   // line thickens as we get closer
+    if(zoomT<1){
+      ctx.globalAlpha=Math.max(0,1-zoomT*1.1);
+      strokePath(1,1.5*px*Math.pow(S,0.3),'rgba(255,255,255,.12)',0,'transparent');
+      ctx.globalAlpha=1;
+    }
+
+    // drawn part: blue→white gradient-ish by layering (wide glow, core)
+    if(prog>0){
+      const upTo=Math.min(prog,1);
+      ctx.globalCompositeOperation='lighter';
+      strokePath(upTo,lwScreen*px*2.6,'rgba(0,102,255,.22)',24*Math.min(S,4),'rgba(0,102,255,.9)');
+      strokePath(upTo,lwScreen*px*1.2,'rgba(60,140,255,.95)',14,'rgba(0,120,255,1)');
+      strokePath(upTo,lwScreen*px*0.45,'rgba(255,255,255,.95)',6,'#fff');
+      ctx.globalCompositeOperation='source-over';
+      // comet head
+      if(prog<1){
+        const hi=Math.floor(upTo*N),hp=pts[hi];
+        ctx.shadowBlur=26;ctx.shadowColor='#4da3ff';
+        ctx.fillStyle='#fff';
+        ctx.beginPath();ctx.arc(hp[0],hp[1],lwScreen*px*1.5,0,Math.PI*2);ctx.fill();
+      }
     }
     ctx.restore();
-    if(t<1) requestAnimationFrame(drawZoomFrame);
-    else {
-      loader.style.display='none';
-      overlay.style.opacity='0';overlay.style.transition='opacity .4s';
-      setTimeout(()=>{overlay.style.display='none';},400);
-      document.getElementById('floatCta').classList.add('visible');
-    }
+    ctx.shadowBlur=0;
   }
-  setTimeout(()=>requestAnimationFrame(drawZoomFrame),50);
-}
+
+  const DRAW_MS = reduce?10:2400, HOLD_MS=reduce?10:380, ZOOM_MS=reduce?10:1650;
+  const t0=performance.now();
+  let phase=0, tPhase=t0;
+  function easeIO(p){return p<.5?4*p*p*p:1-Math.pow(-2*p+2,3)/2}
+  function loop(now){
+    if(phase===0){
+      const p=Math.min((now-t0)/DRAW_MS,1);
+      const e=1-Math.pow(1-p,2.2)*0.85-(1-p)*0.15;   // quick start, gentle finish
+      const prog=p<1?Math.min(Math.max(e,0),1):1;
+      pctEl.innerHTML=Math.round(prog*100)+'<span style="font-size:.5em;opacity:.4">%</span>';
+      frame(true,prog,0);
+      if(p>=1){phase=1;tPhase=now;}
+    }else if(phase===1){
+      // hold, the closed loop breathes
+      frame(true,1,0);
+      if(now-tPhase>=HOLD_MS){phase=2;tPhase=now;loader.classList.add('zooming');document.body.classList.add('loaded');}
+    }else if(phase===2){
+      const p=Math.min((now-tPhase)/ZOOM_MS,1);
+      const z=easeIO(p);
+      frame(true,1,z);
+      // cross-fade the very end so nothing pops
+      canvas.style.opacity=p>0.9?String(1-(p-0.9)/0.1):'1';
+      if(p>=1){
+        loader.classList.add('done');
+        const cta=document.getElementById('floatCta');if(cta)cta.classList.add('visible');
+        return;
+      }
+    }
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+})();
 
 /* ═══════════════════════════════════════════════════════════
    NAV: compact on scroll + color swap
@@ -126,16 +193,53 @@ function startZoomTransition(){
     const scrolled = window.scrollY > 60;
     nav.classList.toggle('scrolled', scrolled);
     // Switch to light nav once past the hero section
-    const probe = 36; // y of the nav bar centre
-    let onDark = false;
-    document.querySelectorAll('[data-section="dark"]').forEach(el=>{
-      const r = el.getBoundingClientRect();
-      if(r.top <= probe && r.bottom > probe) onDark = true;
-    });
-    nav.classList.toggle('on-light', !onDark);
+    // sections are stacked (each new page slides over the last), so ask the browser
+    // which page is actually painted under the nav bar instead of comparing rects
+    const list = document.elementsFromPoint(window.innerWidth/2, 36);
+    let top = null;
+    for(const e of list){
+      if(e.closest('nav,#floatCta,#partnerManager,#logoManager,#loader')) continue;
+      top = e.closest('.stack'); if(top) break;
+    }
+    if(top) nav.classList.toggle('on-light', !top.matches('[data-section="dark"]'));
   }
   window.addEventListener('scroll', update, {passive:true});
   update();
+})();
+
+/* ── PAGE STACK ── */
+(function(){
+  const els=[...document.querySelectorAll('#home,#statsBand,#about,#services,.marquee-band,#workWrap,#photoSection,.brand-section,#partners,#team,#contact,body>footer')];
+  if(!els.length) return;
+  const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion:reduce)').matches;
+  els.forEach((el,i)=>{
+    el.classList.add('stack');
+    if(i<els.length-1 && !reduce){ const sh=document.createElement('i'); sh.className='stack-shade'; el.appendChild(sh); el._shade=sh; el._op=0; }
+  });
+  function layout(){
+    const vh=window.innerHeight;
+    els.forEach(el=>{ el.style.top = Math.min(0, vh-el.offsetHeight)+'px'; });
+  }
+  function shade(){
+    const vh=window.innerHeight;
+    for(let i=0;i<els.length-1;i++){
+      const a=els[i]; if(!a._shade) continue;
+      const rn=els[i+1].getBoundingClientRect();
+      let op=0;
+      if(rn.top<vh && rn.bottom>0){
+        const ra=a.getBoundingClientRect();
+        const p=Math.max(0,Math.min(1,(ra.bottom-rn.top)/Math.min(a.offsetHeight,vh)));
+        op=p*p*0.62;                       // ease-in: dims mostly as the new page takes over
+      } else if(rn.bottom<=0) op=0.62;
+      if(Math.abs(op-a._op)>0.004){ a._op=op; a._shade.style.opacity=op.toFixed(3); }
+    }
+  }
+  layout(); shade();
+  window.addEventListener('resize',()=>{layout();shade();},{passive:true});
+  window.addEventListener('scroll',shade,{passive:true});
+  window.addEventListener('load',()=>{layout();shade();});
+  if(window.ResizeObserver){ const ro=new ResizeObserver(()=>{layout();shade();}); els.forEach(el=>ro.observe(el)); }
+  window._stackEls = els;
 })();
 
 /* Floating CTA dark-section detection */
@@ -151,188 +255,208 @@ function startZoomTransition(){
 })();
 
 /* ═══════════════════════════════════════════════════════════
-   BACKGROUND PARTNER CARDS — Grail style
-   Cards orbit lemniscate path, deep in background,
-   scattered at varying depths like Grail's floating cards.
-   pointer-events:none — not interactive in hero.
-   Photo upload via Partner Manager modal (button outside hero).
+   HERO CARD RING — Grail-style 3D carousel
+   10 cards stand on a tilted ring and turn around it. Fronts face outward,
+   so the far (upper) half of the ring shows the BACKS. The mouse tilts the
+   whole ring and the hovered card pops forward with a Chapter-03 style
+   neon edge. Scrolling gathers the ring into one stack.
 ═══════════════════════════════════════════════════════════ */
 (function(){
   const layer = document.getElementById('orbitCardsLayer');
   if(!layer) return;
-  const N = partners.length; // 12
-  let W, H, cx, cy, A, B;
-  let orbitT = 0;
-  let mouseX = 0, mouseY = 0;
+  const N = partners.length;                     // 10
   const hero = document.getElementById('home');
+  const ring = document.createElement('div');
+  ring.className = 'orbit-ring';
+  layer.appendChild(ring);
+  const lerp=(a,b,t)=>a+(b-a)*t, clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+  const ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+  function hueFromX(nx){ return nx<.5 ? lerp(28,240,nx*2) : lerp(240,280,(nx-.5)*2); }  // same mapping as Chapter 03
 
-  /* ── GRAIL-STYLE CARD CONFIGS
-     Each card has: phase offset, tilt bias, scale bias, blur amount, opacity base
-     Varied to look like cards floating at different depths in 3D space ── */
-  const cardConfigs = partners.map((p, i) => ({
-    phaseOffset: (i / N) * Math.PI * 2,
-    tiltX: (Math.random() * 20 - 10),  // -10 to +10 deg
-    tiltY: (Math.random() * 16 - 8),
-    scaleBase: 0.7 + Math.random() * 0.4,    // 0.7–1.1
-    blurPx: Math.random() * 0.8,             // subtle, only on the far side of the loop
-    opacityBase: 0.85 + Math.random() * 0.15  // 0.85–1.0, clearly visible
+  const BACK_SVG = `<svg width="52" height="32" viewBox="0 0 44 28" fill="none"><path d="M22 14C22 14 17 4 10 4C4.477 4 1 8.477 1 14C1 19.523 4.477 24 10 24C17 24 22 14 22 14ZM22 14C22 14 27 24 34 24C39.523 24 43 19.523 43 14C43 8.477 39.523 4 34 4C27 4 22 14 22 14Z" stroke="#0066FF" stroke-width="2.5" stroke-linecap="round"/></svg><div class="back-label">LOOPER</div>`;
+
+  /* ── per-card personality (fixed, so the ring never jitters) ── */
+  const cfg = partners.map((p,i)=>({
+    yOff : Math.sin(i*2.399+0.6),          // -1..1 height variation
+    roll : Math.sin(i*1.713+1.1)*5,        // small z-roll in degrees
+    pitch: Math.cos(i*2.157+0.3)*6,        // small x-tilt in degrees
+    rad  : 1 + Math.sin(i*3.1+0.4)*0.07,   // radius variation
+    hue  : (i*37+210)%360,
+    hv   : 0, rx:0, ry:0                   // hover amount + pointer offset (smoothed)
   }));
 
-  /* ── Build DOM elements ── */
-  const cardEls = partners.map((p, i) => {
+  const cardEls = partners.map((p,i)=>{
     const wrap = document.createElement('div');
     wrap.className = 'orbit-card';
-    wrap.dataset.index = i;
-
     const inner = document.createElement('div');
     inner.className = 'orbit-card-inner';
 
-    // FRONT
     const front = document.createElement('div');
     front.className = 'orbit-card-front';
-
+    front.style.background = `linear-gradient(160deg,hsl(${cfg[i].hue} 38% 24%) 0%,hsl(${(cfg[i].hue+30)%360} 45% 9%) 100%)`;
     const photoDiv = document.createElement('div');
     photoDiv.className = 'card-photo';
-
     const img = document.createElement('img');
     img.style.display = p.photo ? 'block' : 'none';
     if(p.photo) img.src = p.photo;
     img.alt = '';
     img.onerror = () => { img.style.display = 'none'; };   // missing file -> keep the plain card
     photoDiv.appendChild(img);
-
-    // No name/rank text on card — photo only
-    // Store hint ref (unused visually but kept for manager update logic)
-    const hint = document.createElement('div');
-    hint.className = 'upload-hint';
-    hint.style.display = 'none';
-    photoDiv.appendChild(hint);
-
     front.appendChild(photoDiv);
+    const gloss = document.createElement('div'); gloss.className='card-gloss'; front.appendChild(gloss);
+    const fShade = document.createElement('div'); fShade.className='card-shade'; front.appendChild(fShade);
 
-    // BACK
     const back = document.createElement('div');
     back.className = 'orbit-card-back';
-    back.innerHTML = `<svg width="52" height="32" viewBox="0 0 44 28" fill="none"><path d="M22 14C22 14 17 4 10 4C4.477 4 1 8.477 1 14C1 19.523 4.477 24 10 24C17 24 22 14 22 14ZM22 14C22 14 27 24 34 24C39.523 24 43 19.523 43 14C43 8.477 39.523 4 34 4C27 4 22 14 22 14Z" stroke="#0066FF" stroke-width="2.5" stroke-linecap="round"/></svg><div class="back-label">LOOPER</div>`;
+    back.innerHTML = BACK_SVG;
+    const bShade = document.createElement('div'); bShade.className='card-shade'; back.appendChild(bShade);
 
-    inner.appendChild(front);
-    inner.appendChild(back);
+    inner.appendChild(front); inner.appendChild(back);
     wrap.appendChild(inner);
-    layer.appendChild(wrap);
-
-    // Store img ref for manager updates
-    wrap._img = img;
-    wrap._hint = hint; // kept for manager compatibility
-
+    ring.appendChild(wrap);
+    wrap._inner=inner; wrap._front=front; wrap._back=back; wrap._img=img; wrap._gloss=gloss;
+    wrap._fShade=fShade; wrap._bShade=bShade; wrap._hint={style:{}};
     return wrap;
   });
 
-  /* ── Lemniscate ── */
+  /* ── geometry (recomputed on resize) ── */
+  let W=0,H=0,CW=0,CH=0,R=0;
   function resize(){
     W = layer.offsetWidth || window.innerWidth;
-    H = layer.offsetHeight || window.innerHeight;
-    cx = W/2; cy = H*0.5;
-    // Wider orbit — fills screen edge to edge like Grail
-    A = W * 0.40;
-    B = H * 0.32;  // loop height tuned so cards stay inside the hero band
+    H = layer.offsetHeight || 750;
+    const narrow = W < 700;
+    CW = narrow ? Math.max(104, W*0.27) : clamp(W*0.118, 150, 240);
+    CH = CW*1.4;
+    R  = narrow ? W*0.40 : W*0.32;
+    layer.style.setProperty('--cw', CW+'px');
+    layer.style.setProperty('--ch', CH+'px');
+    layer.style.setProperty('--ringY', (narrow ? 0.62 : 0.53)*H + 'px');
   }
   resize();
   window.addEventListener('resize', resize);
 
-  window.addEventListener('mousemove', e => {
-    if(hero && e.clientY < hero.getBoundingClientRect().bottom){
-      mouseX = (e.clientX - W/2) / W;
-      mouseY = (e.clientY - H/2) / H;
-    }
+  /* ── pointer ── */
+  let mX=-9999, mY=-9999, mNX=0, mNY=0, mIn=false;
+  window.addEventListener('mousemove', e=>{
+    const r = hero.getBoundingClientRect();
+    mX=e.clientX; mY=e.clientY;
+    mIn = e.clientY>=r.top && e.clientY<=r.bottom && e.clientY>=0;
+    mNX = clamp((e.clientX-r.left)/r.width,0,1);        // 0..1
+    mNY = clamp((e.clientY-r.top)/r.height,0,1);
   }, {passive:true});
+  document.addEventListener('mouseleave', ()=>{ mIn=false; });
 
-  function lem(t){
-    const s=Math.sin(t),c=Math.cos(t),d=1+s*s;
-    return {
-      x: cx + A*c/d + mouseX*A*0.05,
-      y: cy + B*2.0*s*c/d + mouseY*B*0.08
-    };
-  }
+  /* ── state ── */
+  let spin = Math.random()*360;          // ring rotation, degrees
+  let speed = 1, par = {x:0,y:0}, accent = 28, hovered = -1, frameNo = 0, last = performance.now();
+  const SPIN_DEG_PER_S = 8;              // slow, even drift
+  let collect = 0;                       // 0 spread … 1 gathered (scroll)
+  let topIdx = -1;                       // card that ends on top of the gathered deck (latched when gathering starts)
+  const norm = a => ((a%360)+540)%360-180;
 
-  /* ── Scroll collect: cards sink downward and vanish as stats slide in ── */
-  let scrollCollect = 0; // 0 = spread, 1 = collected
-  function updateScrollCollect(){
-    const heroEl = document.getElementById('home');
-    if(!heroEl) return;
-    const heroH = heroEl.offsetHeight;
-    const scrolled = window.scrollY;
-    // Start collecting when user begins scrolling, complete by 60% through hero
-    scrollCollect = Math.max(0, Math.min(1, scrolled / (heroH*0.6)));
-  }
-  window.addEventListener('scroll', updateScrollCollect, {passive:true});
+  function frame(now){
+    const dt = Math.min((now-last)/1000, 0.05); last = now;
+    const heroH = hero.offsetHeight || 750;
+    const sc = window.scrollY / (heroH*0.42);
+    collect = clamp(sc,0,1);
+    const ce = ease(collect);
+    if(collect < 0.01) topIdx = -1;
+    else if(topIdx < 0){                 // the card facing the camera most becomes the top of the deck
+      let bA=999; for(let i=0;i<N;i++){ const a=Math.abs(norm(spin+i*360/N)); if(a<bA){bA=a;topIdx=i;} }
+    }
 
-  /* ── Track last flip state to avoid transitioning every frame ── */
-  const flipState = new Array(cardEls.length).fill(0); // 0=front, 1=back
+    // fully covered by the next page → nothing to draw
+    if(window.scrollY > heroH*1.15){ requestAnimationFrame(frame); return; }
 
-  /* ── Position cards ── */
-  function positionCards(){
-    cardEls.forEach((el, i) => {
-      const cfg = cardConfigs[i];
-      const phase = cfg.phaseOffset + orbitT;
-
-      // Depth from lemniscate
-      const sinP=Math.sin(phase), cosP=Math.cos(phase), denom=1+sinP*sinP;
-      const depth = cosP/denom; // -1..+1  (+1 = front, -1 = back of loop)
-      const depthFactor = (depth + 1) / 2; // 0..1
-
-      // Smooth flip: show back face when depth < 0 (card going around back of lemniscate)
-      const shouldShowBack = depth < -0.1;
-      const inner = el.querySelector('.orbit-card-inner');
-      if(inner){
-        const prevFlip = flipState[i];
-        const newFlip = shouldShowBack ? 1 : 0;
-        if(newFlip !== prevFlip){
-          flipState[i] = newFlip;
-          // CSS transition handles the smooth 0.8s rotation
-          inner.style.transform = newFlip ? 'rotateY(180deg)' : 'rotateY(0deg)';
+    // hit-test every 3rd frame (cheap): which front-facing card is under the pointer?
+    if(frameNo++ % 3 === 0){
+      let best=-1, bestA=999;
+      if(mIn && collect<0.25){
+        for(let i=0;i<N;i++){
+          const a = Math.abs(norm(spin + i*360/N));
+          if(a>70) continue;
+          const r = cardEls[i].getBoundingClientRect();
+          if(mX>=r.left && mX<=r.right && mY>=r.top && mY<=r.bottom && a<bestA){ best=i; bestA=a; }
         }
       }
+      hovered = best;
+    }
 
-      // Scroll-collect: cards drift downward and shrink/fade out
-      const lemPos = lem(phase);
-      // Cards sink toward bottom-center as collect progresses
-      const collectX = cx + (cfg.phaseOffset % 1 - 0.5) * W * 0.15; // slight x spread
-      const collectY = H * 1.2; // below viewport
-      const spread = 1 - scrollCollect;
-      const pos = {
-        x: lemPos.x * spread + collectX * scrollCollect,
-        y: lemPos.y * spread + collectY * scrollCollect
-      };
+    // spin eases down while a card is hovered, and while gathering
+    const tgtSpeed = (hovered>=0 ? 0.12 : 1) * (1-ce);
+    speed = lerp(speed, tgtSpeed, clamp(dt*4,0,1));
+    spin += SPIN_DEG_PER_S * speed * dt;                        // degrees per second
 
-      const scale = (cfg.scaleBase * (0.65 + 0.35 * depthFactor)) * (1 - scrollCollect * 0.4);
-      const opacity = cfg.opacityBase * (0.72 + 0.28 * depthFactor) * (1 - scrollCollect);
-      const blur = depthFactor < 0.35 ? cfg.blurPx * (1 - depthFactor / 0.35) : 0;
+    // mouse parallax on the whole ring (smoothed)
+    const tx = mIn ? (mNX-.5) : 0, ty = mIn ? (mNY-.5) : 0;
+    par.x = lerp(par.x, tx, clamp(dt*3,0,1));
+    par.y = lerp(par.y, ty, clamp(dt*3,0,1));
+    accent = lerp(accent, hueFromX(mIn?mNX:.5), clamp(dt*3,0,1));
 
-      // Tangent-based subtle rotation
-      const tangent = lem(phase + 0.015);
-      const tangentAngle = Math.atan2(tangent.y - lemPos.y, tangent.x - lemPos.x) * 0.1;
-      const totalRotZ = cfg.tiltY + tangentAngle * (180/Math.PI);
+    const tilt = lerp(-13, 0, ce) + par.y*-8;
+    ring.style.transform =
+      `translateY(${(-ce*115).toFixed(1)}px) rotateX(${(tilt).toFixed(2)}deg) rotateY(${(par.x*14).toFixed(2)}deg) scale(${(1-ce*0.22).toFixed(3)})`;
+    layer.style.opacity = (1 - clamp((collect-0.8)/0.2,0,1)).toFixed(3);
 
-      const w = 140 * scale, h = 196 * scale;
+    for(let i=0;i<N;i++){
+      const el=cardEls[i], c=cfg[i];
+      const a = norm(spin + i*360/N);                     // -180..180, 0 = facing the camera
+      // gathered deck: one card on top, the rest lined up right behind it (rank k = how far behind)
+      const k = topIdx<0 ? 0 : (i-topIdx+N)%N;
+      const cei = ease(clamp(collect*1.2 - k*0.025, 0, 1));          // tiny stagger so they tuck in one after another
+      const aEff = lerp(a, 0, cei);
+      const Reff = lerp(R*c.rad, -k*16, cei);
+      const y = lerp(c.yOff*CH*0.16, -k*7, cei);
+      const x = 0;
+      el.style.transform =
+        `rotateY(${aEff.toFixed(2)}deg) translate3d(${x.toFixed(1)}px,${y.toFixed(1)}px,${Reff.toFixed(1)}px) rotateZ(${(c.roll*(1-cei)).toFixed(2)}deg) rotateX(${(c.pitch*(1-cei)).toFixed(2)}deg)`;
 
-      el.style.left   = (pos.x - w/2) + 'px';
-      el.style.top    = (pos.y - h/2) + 'px';
-      el.style.width  = w + 'px';
-      el.style.height = h + 'px';
-      el.style.opacity = opacity.toFixed(3);
-      el.style.filter = blur > 0.25 ? `blur(${blur.toFixed(1)}px)` : '';
-      el.style.transform = `rotateZ(${totalRotZ.toFixed(1)}deg) rotateX(${cfg.tiltX.toFixed(1)}deg)`;
-    });
-  }
+      // far side slightly dimmer (depth cue); near side fully lit
+      const depth = Math.cos(a*Math.PI/180);               // 1 near … -1 far
+      const sh = Math.min(0.55, 0.34*(1-(depth+1)/2)*(1-cei) + cei*k*0.045).toFixed(3);   // deck: each card behind is a little darker
+      el._fShade.style.opacity = sh; el._bShade.style.opacity = sh;
 
-  /* ── Frame loop ── */
-  function frame(){
-    orbitT += 0.0025; // gentle drift
-    updateScrollCollect();
-    positionCards();
+      // hover — pop forward, turn to face the camera, tilt toward the pointer, neon edge
+      c.hv = lerp(c.hv, i===hovered?1:0, clamp(dt*9,0,1));
+      if(i===hovered){
+        const r = el.getBoundingClientRect();
+        c.rx = lerp(c.rx, clamp((mX-(r.left+r.right)/2)/(r.width||1),-.5,.5), clamp(dt*10,0,1));
+        c.ry = lerp(c.ry, clamp((mY-(r.top+r.bottom)/2)/(r.height||1),-.5,.5), clamp(dt*10,0,1));
+      }
+      if(c.hv>0.003){
+        const hv=c.hv;
+        el._inner.style.transform =
+          `translateZ(${(hv*120).toFixed(1)}px) rotateY(${(-aEff*hv*0.85 + c.rx*hv*26).toFixed(2)}deg) rotateX(${(-c.ry*hv*22).toFixed(2)}deg) scale(${(1+hv*0.07).toFixed(3)})`;
+        el._front.style.boxShadow =
+          `0 0 0 ${(1+hv).toFixed(1)}px hsla(${accent.toFixed(0)},100%,62%,${(hv*0.95).toFixed(2)}),0 0 ${(60*hv).toFixed(0)}px hsla(${accent.toFixed(0)},100%,55%,${(hv*0.55).toFixed(2)}),0 18px 50px rgba(0,0,0,.6)`;
+        el._gloss.style.opacity = hv.toFixed(2);
+        el._gloss.style.background =
+          `radial-gradient(circle at ${((c.rx+.5)*100).toFixed(0)}% ${((c.ry+.5)*100).toFixed(0)}%,hsla(${accent.toFixed(0)},100%,80%,.24),transparent 62%)`;
+        el._wasHover = true;
+      } else if(el._wasHover){
+        el._inner.style.transform=''; el._front.style.boxShadow=''; el._gloss.style.opacity=0; el._wasHover=false;
+      }
+      el.style.zIndex = i===hovered ? 5 : 1;
+    }
     requestAnimationFrame(frame);
   }
-  frame();
+  requestAnimationFrame(frame);
+
+  /* ── back image (one for all cards) ── */
+  function applyBack(url){
+    cardEls.forEach(w=>{
+      const b = w._back; if(!b) return;
+      if(url){ b.style.backgroundImage = `url("${url}")`; b.classList.add('has-img'); }
+      else { b.style.backgroundImage = ''; b.classList.remove('has-img'); }
+    });
+  }
+  window._setCardBack = function(url){ applyBack(url); };
+  if(cardBackUrl) applyBack(cardBackUrl);
+  if(LOOPER_CFG.cardBack){                                  // file from js/config.js — used only if it exists
+    const probe = new Image();
+    probe.onload = () => { cardBackUrl = LOOPER_CFG.cardBack; applyBack(cardBackUrl); window._cardBackFromConfig = true; const pv=document.getElementById('pmBackPrev'); if(pv) pv.style.backgroundImage=`url("${cardBackUrl}")`; };
+    probe.src = LOOPER_CFG.cardBack;
+  }
 
   /* ── Expose update function for partner manager ── */
   window._updateCardPhoto = function(index, photoDataUrl){
@@ -340,7 +464,6 @@ function startZoomTransition(){
     if(!wrap) return;
     wrap._img.src = photoDataUrl;
     wrap._img.style.display = 'block';
-    wrap._hint.style.display = 'none';
   };
 })();
 
@@ -384,20 +507,42 @@ function startZoomTransition(){
       input.addEventListener('change', e => {
         const file = e.target.files[0];
         if(!file) return;
-        const reader = new FileReader();
-        reader.onload = ev => {
-          partners[i].photo = ev.target.result;
+        fileToDataUrl(file, 700, url => {
+          partners[i].photo = url;
           savePartners(partners);
-          if(window._updateCardPhoto) window._updateCardPhoto(i, ev.target.result);
+          if(window._updateCardPhoto) window._updateCardPhoto(i, url);
           buildManager(); // refresh UI
-        };
-        reader.readAsDataURL(file);
+        });
       });
       card.appendChild(input);
       grid.appendChild(card);
     });
   }
   buildManager();
+
+  /* back-of-card upload */
+  const bIn = document.getElementById('pmBackInput'), bPrev = document.getElementById('pmBackPrev'), bReset = document.getElementById('pmBackReset');
+  function showBackPrev(){
+    if(!bPrev) return;
+    bPrev.style.backgroundImage = cardBackUrl ? `url("${cardBackUrl}")` : '';
+    bPrev.innerHTML = cardBackUrl ? '' : '<svg width="40" height="25" viewBox="0 0 44 28" fill="none"><path d="M22 14C22 14 17 4 10 4C4.477 4 1 8.477 1 14C1 19.523 4.477 24 10 24C17 24 22 14 22 14ZM22 14C22 14 27 24 34 24C39.523 24 43 19.523 43 14C43 8.477 39.523 4 34 4C27 4 22 14 22 14Z" stroke="#0066FF" stroke-width="2.5" stroke-linecap="round"/></svg>';
+  }
+  showBackPrev();
+  if(bIn) bIn.addEventListener('change', e => {
+    const f = e.target.files[0]; if(!f) return;
+    fileToDataUrl(f, 900, url => {
+      cardBackUrl = url;
+      try{ localStorage.setItem('looper_card_back', url); }catch(err){}
+      if(window._setCardBack) window._setCardBack(url);
+      showBackPrev();
+    });
+  });
+  if(bReset) bReset.addEventListener('click', () => {
+    cardBackUrl = '';
+    try{ localStorage.removeItem('looper_card_back'); }catch(err){}
+    if(window._setCardBack) window._setCardBack('');
+    showBackPrev();
+  });
 
   // Expose open function
   window.openPartnerManager = function(){
@@ -525,7 +670,10 @@ function startZoomTransition(){
   let ix=0, iy=0, iraf=0, imgOk = {};
   function itick(){
     ix += (mx-ix)*0.12; iy += (my-iy)*0.12;
-    hoverImg.style.transform = 'translate3d('+(ix-hoverImg.offsetWidth/2)+'px,'+(iy-hoverImg.offsetHeight/2)+'px,0)';
+    const iw=hoverImg.offsetWidth, ih=hoverImg.offsetHeight, pad=12;
+    const px=Math.max(pad,Math.min(window.innerWidth-iw-pad, ix-iw/2));
+    const py=Math.max(pad,Math.min(window.innerHeight-ih-pad, iy-ih/2));
+    hoverImg.style.transform = 'translate3d('+px+'px,'+py+'px,0)';
     iraf = requestAnimationFrame(itick);
   }
   rows.forEach((row,i)=>{
@@ -537,9 +685,10 @@ function startZoomTransition(){
     probe.src = src;
   });
   rows.forEach((row,i)=>{
-    row.addEventListener('mouseenter',()=>{
+    row.addEventListener('mouseenter',(ev)=>{
       if(imgOk[i]){
         hoverImg.src = imgOk[i];
+        if(ev && ev.clientX!=null){ mx = ev.clientX; my = ev.clientY; }
         ix = mx; iy = my;
         hoverImg.classList.add('on');
         cursor.classList.add('hide');
@@ -735,6 +884,157 @@ document.querySelectorAll('.ph-card').forEach(card=>{
   });
 });
 
+})();
+
+/* ═══════════════════════════════════════════════════════════
+   PARTNERS COLLAGE
+   12 logo cards scattered around the headline at three depths.
+   Mouse + scroll parallax (deeper = more movement), staggered reveal,
+   Chapter-03 style neon hover. Logos come from LOOPER_CONFIG.partners
+   (images/partners/01 … 12) or from the "Partner logos" uploader.
+═══════════════════════════════════════════════════════════ */
+(function(){
+  const section = document.getElementById('partners');
+  const stage = document.getElementById('ptStage');
+  if(!section || !stage) return;
+
+  // caption, x%, y%, width@1440, depth(0 back … 2 front), tilt°
+  const DATA = [
+    ['#1 Bank in Georgia',                          2,   9,  205, 1, -1.5],
+    ['#1 Transportation Company in Georgia',       15.5,15,  195, 0,  1.0],
+    ['Most Trusted Insurance Company in Georgia',   2,  40,  225, 2,  1.2],
+    ['#2 Private University in Georgia',           16.5,50,  200, 1, -1.0],
+    ['#3 Auto Parts Distributor in Georgia',        7,  72,  195, 0,  0.8],
+    ['#4 Oil Importer in Georgia',                 70.5, 8,  205, 1,  1.5],
+    ['Tbilisi’s hub for dining and work',     84,  17,  195, 0, -1.0],
+    ['Trusted leader in International Retail',     71,  39,  225, 2, -1.2],
+    ['Highest Ranked Real Estate in Georgia',      84,  50,  200, 1,  1.0],
+    ['Top-Ranked Public School in Georgia',        78,  72,  195, 0, -0.8],
+    ['#1 Sales and Marketing Consulting',          25,  75,  210, 2,  1.0],
+    ['Leading Global Pizza Delivery Brand',        56,  76,  205, 1, -1.0],
+  ];
+  const BLUR=[1.6,0,0], OP=[.6,.92,1], Z=[1,2,3], PAR=[.5,1,1.6];
+  const lerp=(a,b,t)=>a+(b-a)*t, clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+
+  /* saved uploads (per browser) */
+  let saved = {};
+  try{ saved = JSON.parse(localStorage.getItem('looper_logos')||'{}') || {}; }catch(e){}
+
+  /* build tiles */
+  const tiles = DATA.map((d,i)=>{
+    const tile = document.createElement('div');
+    tile.className = 'pt-tile';
+    tile.style.setProperty('--x', d[1]); tile.style.setProperty('--y', d[2]); tile.style.setProperty('--w', d[3]);
+    tile.style.setProperty('--z', Z[d[4]]);
+    tile.style.setProperty('--r', d[5]+'deg');
+    tile.style.setProperty('--blur', BLUR[d[4]]+'px');
+    tile.style.setProperty('--op', OP[d[4]]);
+    tile.style.setProperty('--d', (i*0.06).toFixed(2)+'s');
+    const card = document.createElement('div'); card.className='pt-card';
+    const logo = document.createElement('div'); logo.className='pt-logo';
+    const cap  = document.createElement('div'); cap.className='pt-cap'; cap.textContent = d[0];
+    card.appendChild(logo); card.appendChild(cap); tile.appendChild(card); stage.appendChild(tile);
+    tile._logo = logo; tile._depth = d[4]; tile._i = i;
+    setLogo(tile, null);
+    return tile;
+  });
+
+  function setLogo(tile, url){
+    tile._logo.innerHTML = '';
+    if(url){
+      const im = new Image(); im.alt = DATA[tile._i][0]; im.decoding='async';
+      im.onerror = () => setLogo(tile,null);
+      im.src = url; tile._logo.appendChild(im);
+    } else {
+      const ph = document.createElement('span'); ph.className='pt-ph'; ph.textContent = 'Logo '+String(tile._i+1).padStart(2,'0');
+      tile._logo.appendChild(ph);
+    }
+  }
+  window._setPartnerLogo = (i,url)=>{ if(tiles[i]) setLogo(tiles[i],url); };
+
+  /* logo source: browser upload first, then files from js/config.js (path with or without extension) */
+  tiles.forEach((t,i)=>{ if(saved[i]) setLogo(t,saved[i]); });
+  const EXTS = ['png','svg','jpg','jpeg','webp'];
+  function probe(base, done){
+    const list = /\.[a-z0-9]{2,4}$/i.test(base) ? [base] : EXTS.map(e=>base+'.'+e);
+    (function next(k){
+      if(k>=list.length) return done(null);
+      const im = new Image(); im.onload=()=>done(list[k]); im.onerror=()=>next(k+1); im.src=list[k];
+    })(0);
+  }
+  const cfgLogos = (window.LOOPER_CONFIG && window.LOOPER_CONFIG.partners) || [];
+  cfgLogos.slice(0,DATA.length).forEach((base,i)=>{ if(base) probe(base, url=>{ if(url){ tiles[i]._cfg = url; setLogo(tiles[i],url); } }); });
+
+  /* reveal */
+  const io = new IntersectionObserver(es=>{ es.forEach(e=>{ section.classList.toggle('pt-section-in', e.isIntersecting || section.classList.contains('pt-section-in')); }); },{threshold:.2});
+  io.observe(section);
+
+  /* parallax + accent hue (same mouse→hue map as Chapter 03) */
+  let mx=0,my=0,tmx=0,tmy=0,vis=false,raf=0, hue=28;
+  new IntersectionObserver(es=>{ vis = es[0].isIntersecting; if(vis && !raf) raf=requestAnimationFrame(loop); },{threshold:0}).observe(section);
+  section.addEventListener('mousemove',e=>{
+    const r=section.getBoundingClientRect();
+    tmx=(e.clientX-r.left)/r.width-.5; tmy=(e.clientY-r.top)/r.height-.5;
+  },{passive:true});
+  section.addEventListener('mouseleave',()=>{tmx=0;tmy=0;});
+  const narrow = ()=>window.innerWidth<=820;
+  function loop(){
+    raf=0; if(!vis) return;
+    mx=lerp(mx,tmx,.07); my=lerp(my,tmy,.07);
+    const r=section.getBoundingClientRect(), vh=window.innerHeight;
+    const t=clamp((r.top+r.height/2-vh/2)/vh,-1.2,1.2);
+    const nx=clamp(mx+.5,0,1);
+    hue=lerp(hue, nx<.5?lerp(28,240,nx*2):lerp(240,280,(nx-.5)*2), .08);
+    stage.style.setProperty('--accent', hue.toFixed(0));
+    if(!narrow()){
+      tiles.forEach(tile=>{
+        const f=PAR[tile._depth];
+        tile.style.setProperty('--px',(mx*34*f).toFixed(1)+'px');
+        tile.style.setProperty('--py',(my*22*f - t*70*f).toFixed(1)+'px');
+      });
+    }
+    raf=requestAnimationFrame(loop);
+  }
+
+  /* uploader */
+  const openBtn=document.getElementById('ptOpen'), modal=document.getElementById('logoManager'), grid=document.getElementById('lmGrid');
+  if(window.LOOPER_CONFIG && window.LOOPER_CONFIG.showUploader===false && openBtn) openBtn.hidden=true;
+  function fileToLogo(file, cb){
+    if(/svg/.test(file.type)){ const fr=new FileReader(); fr.onload=e=>cb(e.target.result); fr.readAsDataURL(file); return; }
+    const fr=new FileReader();
+    fr.onload=ev=>{
+      const im=new Image();
+      im.onload=()=>{
+        const k=Math.min(1,520/Math.max(im.width,im.height));
+        const c=document.createElement('canvas'); c.width=Math.round(im.width*k); c.height=Math.round(im.height*k);
+        c.getContext('2d').drawImage(im,0,0,c.width,c.height);
+        cb(c.toDataURL(/jpe?g/.test(file.type)?'image/jpeg':'image/png',0.9));   // keeps transparency for PNG
+      };
+      im.onerror=()=>cb(ev.target.result); im.src=ev.target.result;
+    };
+    fr.readAsDataURL(file);
+  }
+  function buildGrid(){
+    grid.innerHTML='';
+    DATA.forEach((d,i)=>{
+      const lab=document.createElement('label'); lab.className='pm-card';
+      const box=document.createElement('div');
+      box.style.cssText='width:100%;aspect-ratio:1;background:#0b141b;display:flex;align-items:center;justify-content:center;padding:12px';
+      const url = saved[i] || tiles[i]._cfg;
+      if(url){ const im=new Image(); im.src=url; im.style.cssText='max-width:100%;max-height:100%;object-fit:contain'; box.appendChild(im); }
+      else { box.innerHTML='<span style="font:800 .6rem Syne,sans-serif;color:#555;text-align:center">'+d[0]+'</span>'; }
+      lab.appendChild(box);
+      const nm=document.createElement('div'); nm.className='pm-card-name'; nm.textContent='Logo '+String(i+1).padStart(2,'0'); lab.appendChild(nm);
+      const inp=document.createElement('input'); inp.type='file'; inp.accept='image/*';
+      inp.addEventListener('change',e=>{ const f=e.target.files[0]; if(!f) return;
+        fileToLogo(f,url=>{ saved[i]=url; try{localStorage.setItem('looper_logos',JSON.stringify(saved));}catch(err){} setLogo(tiles[i],url); buildGrid(); });
+      });
+      lab.appendChild(inp); grid.appendChild(lab);
+    });
+  }
+  buildGrid();
+  if(openBtn) openBtn.addEventListener('click',()=>{ buildGrid(); modal.classList.add('open'); });
+  const cl=document.getElementById('lmClose'); if(cl) cl.addEventListener('click',()=>modal.classList.remove('open'));
 })();
 
 /* Team cards stagger */
@@ -1066,7 +1366,7 @@ const wtTicks=document.getElementById('wtTicks'),wtMarker=document.getElementByI
   for(let k=0;k<=(N-1)*TICKS_PER;k++){
     const t=document.createElement('div');
     t.className='wt-tick'+(k%TICKS_PER===0?' major':'');
-    t.addEventListener('click',()=>{idxTarget=clamp(Math.round(k/TICKS_PER),0,N-1);});
+    t.addEventListener('click',()=>{scrollToIdx(clamp(Math.round(k/TICKS_PER),0,N-1));});
     wtTicks.insertBefore(t,wtMarker);
   }
 })();
@@ -1221,31 +1521,29 @@ requestAnimationFrame(ts=>{t0=ts;render(ts);});
 
 /* ── Scroll navigation ── */
 const SEC=document.getElementById('work');
-let scrollCooldown=0;
-function navigate(dir){
-  idxTarget=clamp(idxTarget+dir,0,N-1);
+/* Chapter 03 is PINNED and driven by the page scroll (like Visual Stories):
+   the wrapper is tall, #work sticks, and scroll position = which project is centred.
+   The next section can't appear until the last project has been reached —
+   wherever the cursor is, because it's plain page scrolling. */
+const WRAP=document.getElementById('workWrap'),ANCH=document.getElementById('workAnchor');
+function stepPx(){return Math.max(360,Math.min(560,window.innerHeight*0.55));}
+function layoutWrap(){ if(WRAP&&SEC) WRAP.style.height=(SEC.offsetHeight+(N-1)*stepPx())+'px'; }
+function anchorTop(){ return ANCH.getBoundingClientRect().top+window.scrollY; }
+function scrollIdx(){
+  if(!ANCH) return;
+  const p=clamp((window.scrollY-anchorTop())/((N-1)*stepPx()),0,1);
+  idxTarget=Math.round(p*(N-1));
 }
-/* At boundary (first or last slide) don't block page scroll so user can exit section */
-let _scrollLocked=false;
-let _scrollLockTO=null;
-SEC&&SEC.addEventListener('wheel',e=>{
-  const r=SEC.getBoundingClientRect();
-  // section not in view — ignore
-  if(r.top>window.innerHeight*0.6||r.bottom<window.innerHeight*0.4)return;
-  const dir=e.deltaY>0?1:-1;
-  const atBoundary=(dir>0&&idxTarget>=N-1)||(dir<0&&idxTarget<=0);
-  if(atBoundary){
-    // Allow native scroll to exit the section
-    scrollAcc=0;
-    return;
-  }
-  e.preventDefault();
-  scrollAcc+=e.deltaY;
-  if(Math.abs(scrollAcc)>80){
-    navigate(scrollAcc>0?1:-1);
-    scrollAcc=0;
-  }
-},{passive:false});
+function scrollToIdx(k){
+  k=clamp(k,0,N-1);
+  window.scrollTo({top:anchorTop()+k*stepPx(),behavior:'smooth'});
+}
+function navigate(dir){ scrollToIdx(idxTarget+dir); }
+layoutWrap();scrollIdx();
+window.addEventListener('scroll',scrollIdx,{passive:true});
+window.addEventListener('resize',()=>{layoutWrap();scrollIdx();},{passive:true});
+window.addEventListener('load',()=>{layoutWrap();scrollIdx();});
+if(window.ResizeObserver&&SEC){new ResizeObserver(()=>{layoutWrap();scrollIdx();}).observe(SEC);}
 
 /* ── Touch swipe ── */
 let touchX=0,touchY=0;
@@ -1276,13 +1574,16 @@ SEC&&SEC.addEventListener('mousemove',e=>{
 });
 SEC&&SEC.addEventListener('mouseleave',()=>{inSection=false;mousePX=mousePY=-9999;});
 /* click a side card to bring it to the centre */
-canvas.addEventListener('click',()=>{if(hoverI>=0)idxTarget=hoverI;});
+canvas.addEventListener('click',()=>{if(hoverI>=0)scrollToIdx(hoverI);});
 
 /* ── Keyboard ── */
 document.addEventListener('keydown',e=>{
   if(!SEC)return;
   const r=SEC.getBoundingClientRect();
   if(r.top>window.innerHeight||r.bottom<0)return;
+  // pages are stacked: only react while this page is the one actually on screen
+  const topEl=document.elementFromPoint(window.innerWidth/2,window.innerHeight/2);
+  if(!topEl||!SEC.contains(topEl))return;
   if(e.key==='ArrowRight'||e.key==='ArrowDown')navigate(1);
   if(e.key==='ArrowLeft'||e.key==='ArrowUp')navigate(-1);
 });
