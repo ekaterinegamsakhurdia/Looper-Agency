@@ -1,0 +1,531 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Looper Agency</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=DM+Mono:wght@400;500&display=swap">
+
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<!-- LOADER -->
+<div id="loader">
+  <svg id="loader-logo" viewBox="0 0 320 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path class="blue" d="M160 80 C160 80 110 10 60 10 C26 10 2 38 2 80 C2 122 26 150 60 150 C110 150 160 80 160 80 Z M160 80 C160 80 210 150 260 150 C294 150 318 122 318 80 C318 38 294 10 260 10 C210 10 160 80 160 80 Z" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M160 80 C160 80 123 36 92 36 C72 36 55 56 55 80 C55 104 72 124 92 124 C123 124 160 80 160 80 Z M160 80 C160 80 197 124 228 124 C248 124 265 104 265 80 C265 56 248 36 228 36 C197 36 160 80 160 80 Z" stroke="rgba(255,255,255,0.18)" stroke-width="2"/>
+    <text x="160" y="145" font-family="Syne,sans-serif" font-weight="800" font-size="18" fill="white" text-anchor="middle" letter-spacing="6" opacity="0" id="loaderText">LOOPER</text>
+  </svg>
+  <div>
+    <div class="loader-pct" id="loaderPct">0<span style="font-size:.5em;opacity:.4">%</span></div>
+    <div class="loader-label">Loading experience</div>
+  </div>
+  <div class="loader-bar-wrap" id="loaderBarWrap">
+    <div class="loader-bar" id="loaderBar"></div>
+  </div>
+</div>
+
+<div id="zoomOverlay"><canvas id="zoomCanvas"></canvas></div>
+
+<!-- NAV -->
+<nav id="mainNav">
+  <a class="nav-logo" href="#">
+    <svg width="22" height="14" viewBox="0 0 44 28" fill="none"><path d="M22 14C22 14 17 4 10 4C4.477 4 1 8.477 1 14C1 19.523 4.477 24 10 24C17 24 22 14 22 14ZM22 14C22 14 27 24 34 24C39.523 24 43 19.523 43 14C43 8.477 39.523 4 34 4C27 4 22 14 22 14Z" stroke="#0066FF" stroke-width="2.5" stroke-linecap="round"/></svg>
+    LOOPER
+  </a>
+  <ul class="nav-links">
+    <li><a href="#services">Services</a></li>
+    <li><a href="#partners">Partners</a></li>
+    <li><a href="#work">Work</a></li>
+    <li><a href="#team">Team</a></li>
+  </ul>
+  <a class="nav-btn" href="#contact">Get in Touch</a>
+</nav>
+
+<!-- Floating CTA -->
+<a class="float-cta" href="#contact" id="floatCta">
+  <span class="float-cta-icon">
+    <svg width="16" height="16" viewBox="0 0 44 28" fill="none"><path d="M22 14C22 14 17 4 10 4C4.477 4 1 8.477 1 14C1 19.523 4.477 24 10 24C17 24 22 14 22 14ZM22 14C22 14 27 24 34 24C39.523 24 43 19.523 43 14C43 8.477 39.523 4 34 4C27 4 22 14 22 14Z" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>
+  </span>
+  Start a Project
+</a>
+
+<!-- HERO — DARK, GRAIL-STYLE -->
+<section class="hero" id="home" data-section="dark">
+  <!-- Background cards layer — z-index 0, pointer-events none -->
+  <div id="orbitCardsLayer"></div>
+
+  <!-- Hero content: title + sub ABOVE cards, actions BELOW cards -->
+  <div class="hero-top"><div class="hero-head">
+  <p class="hero-eyebrow">Marketing Communications Agency · Tbilisi, Georgia</p>
+  <h1 class="hero-title" id="heroTitle">
+    <span class="word" style="animation-delay:.05s">BREAK</span><span style="display:inline"> </span><span class="word blue" style="animation-delay:.2s">THE</span><span style="display:inline"> </span><span class="word" style="animation-delay:.35s">LOOP</span>
+  </h1>
+  </div><!-- /hero-head -->
+  <!-- Cards layer sits here in z-order (position:absolute so doesn't affect flow) -->
+  <div class="hero-side">
+  </div><!-- /hero-side --></div><!-- /hero-top -->
+  <div class="scroll-hint">
+    <span>Scroll</span>
+    <svg width="14" height="20" viewBox="0 0 14 20" fill="none"><rect x="1" y="1" width="12" height="18" rx="6" stroke="white" stroke-opacity=".25" stroke-width="1.5"/><rect x="6" y="4" width="2" height="5" rx="1" fill="white" fill-opacity=".25"><animate attributeName="y" values="4;8;4" dur="1.8s" repeatCount="indefinite"/></rect></svg>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-band" id="statsBand">
+  <div class="stats-row">
+    <div class="stat-cell rv"><div class="stat-num" data-count="102" data-suffix="+">0</div><div class="stat-label">Local Partners</div></div>
+    <div class="stat-cell rv"><div class="stat-num">∞</div><div class="stat-label">Global Reach</div></div>
+    <div class="stat-cell rv"><div class="stat-num" data-count="500" data-suffix="+">0</div><div class="stat-label">Projects Done</div></div>
+    <div class="stat-cell rv"><div class="stat-num" data-count="3" data-suffix="M+">0</div><div class="stat-label">Ad Spend Managed</div></div>
+  </div>
+</div>
+
+<!-- STATEMENT -->
+<section class="statement-section" id="about" data-section="dark">
+  <canvas id="infCanvas"></canvas>
+  <div class="statement-inner">
+    <p class="sec-eyebrow rv" style="color:var(--blue);margin-bottom:28px">What We Believe</p>
+    <h2 class="statement-title" id="stmtTitle">
+      <span class="sl" data-line="0">GREAT BRANDS</span><br>
+      <span class="sl" data-line="1">AREN'T BUILT</span><br>
+      <span class="sl" data-line="2">THEY'RE <span class="blue">LOOPED</span></span>
+    </h2>
+    <p class="statement-sub">Every campaign, every identity, every pixel — an infinite loop of strategy, creativity, and impact. Five years. 102+ partners. Zero compromises.</p>
+  </div>
+  <span class="chapter-label chapter-label-white" id="chap1">Chapter 01</span>
+  <span class="chapter-label-left chapter-label-white" id="chap1l">What We Believe</span>
+</section>
+
+<!-- SERVICES — Signal-style row list -->
+<div class="services-section" id="services" data-section="dark">
+  <!-- Custom cursor element (follows mouse) -->
+  <div id="svcCursor">
+    <!-- Default icon shown when no row is hovered -->
+    <svg viewBox="0 0 44 28" fill="none" xmlns="http://www.w3.org/2000/svg" id="svcCursorDefault">
+      <path d="M22 14C22 14 17 4 10 4C4.477 4 1 8.477 1 14C1 19.523 4.477 24 10 24C17 24 22 14 22 14ZM22 14C22 14 27 24 34 24C39.523 24 43 19.523 43 14C43 8.477 39.523 4 34 4C27 4 22 14 22 14Z" stroke="#0066FF" stroke-width="2.5" stroke-linecap="round"/>
+    </svg>
+    <!-- Service-specific icon slot -->
+    <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" id="svcCursorIcon" style="display:none;position:absolute;inset:0;padding:16px">
+      <!-- paths are swapped by JS -->
+    </svg>
+  </div>
+
+  <div class="services-inner">
+    <div class="services-header">
+      <div>
+        <p class="sec-eyebrow rv">What We Do</p>
+        <h2 class="sec-title rv">Services<br>We Offer</h2>
+      </div>
+      <a class="btn-blue rv" href="#contact">Work With Us →</a>
+    </div>
+
+    <div class="svc-rule"></div>
+
+    <!-- Row: data-icon = SVG path string shown in cursor -->
+    <div class="svc-row rv"
+      data-icon="M8 24L24 8L40 24M24 8V40"
+      data-icon-label="Social">
+      <span class="svc-row-num">A — 1</span>
+      <div class="svc-meta"><span>Service</span><b>01 / 09</b></div>
+      <span class="svc-row-name">Social Media</span>
+      <span class="svc-cap">Looper — Social Media</span>
+      <div class="svc-row-tags"><span class="svc-list-label">Includes</span><div class="svc-list"><span>Content Strategy</span><span>Community Management</span><span>Paid Social</span></div></div>
+    </div>
+
+    <div class="svc-row rv"
+      data-icon="M6 36L18 24L28 34L38 20M38 20H30M38 20V28"
+      data-icon-label="Performance">
+      <span class="svc-row-num">A — 2</span>
+      <div class="svc-meta"><span>Service</span><b>02 / 09</b></div>
+      <span class="svc-row-name">Digital Marketing</span>
+      <span class="svc-cap">Looper — Digital Marketing</span>
+      <div class="svc-row-tags"><span class="svc-list-label">Includes</span><div class="svc-list"><span>SEO / SEM</span><span>Performance Campaigns</span><span>Analytics</span></div></div>
+    </div>
+
+    <div class="svc-row rv"
+      data-icon="M10 38V24A14 14 0 0 1 38 24V38M24 10V14M12 14L15 17M36 14L33 17"
+      data-icon-label="Production">
+      <span class="svc-row-num">A — 3</span>
+      <div class="svc-meta"><span>Service</span><b>03 / 09</b></div>
+      <span class="svc-row-name">Photo &amp; Video Production</span>
+      <span class="svc-cap">Looper — Photo & Video Production</span>
+      <div class="svc-row-tags"><span class="svc-list-label">Includes</span><div class="svc-list"><span>Commercial Video</span><span>Photography</span><span>Post-production</span></div></div>
+    </div>
+
+    <div class="svc-row rv"
+      data-icon="M24 10C17.37 10 12 15.37 12 22S17.37 34 24 34 36 28.63 36 22 30.63 10 24 10ZM24 18V26M20 22H28"
+      data-icon-label="Brand">
+      <span class="svc-row-num">A — 4</span>
+      <div class="svc-meta"><span>Service</span><b>04 / 09</b></div>
+      <span class="svc-row-name">Branding</span>
+      <span class="svc-cap">Looper — Branding</span>
+      <div class="svc-row-tags"><span class="svc-list-label">Includes</span><div class="svc-list"><span>Brand Identity</span><span>Visual System</span><span>Brand Strategy</span></div></div>
+    </div>
+
+    <div class="svc-row rv"
+      data-icon="M10 14H38M10 24H28M10 34H20M36 28L42 34L36 40"
+      data-icon-label="Design">
+      <span class="svc-row-num">A — 5</span>
+      <div class="svc-meta"><span>Service</span><b>05 / 09</b></div>
+      <span class="svc-row-name">Graphic &amp; Motion Design</span>
+      <span class="svc-cap">Looper — Graphic & Motion Design</span>
+      <div class="svc-row-tags"><span class="svc-list-label">Includes</span><div class="svc-list"><span>Print Design</span><span>Motion Graphics</span><span>UI / UX</span></div></div>
+    </div>
+
+    <div class="svc-row rv"
+      data-icon="M8 16H40V36H8V16ZM8 16L24 26L40 16"
+      data-icon-label="Commerce">
+      <span class="svc-row-num">A — 6</span>
+      <div class="svc-meta"><span>Service</span><b>06 / 09</b></div>
+      <span class="svc-row-name">E-commerce</span>
+      <span class="svc-cap">Looper — E-commerce</span>
+      <div class="svc-row-tags"><span class="svc-list-label">Includes</span><div class="svc-list"><span>Store Development</span><span>Conversion Optimisation</span><span>CRM</span></div></div>
+    </div>
+
+    <div class="svc-row rv"
+      data-icon="M12 36L24 12L36 36M18 28H30"
+      data-icon-label="Campaigns">
+      <span class="svc-row-num">A — 7</span>
+      <div class="svc-meta"><span>Service</span><b>07 / 09</b></div>
+      <span class="svc-row-name">Integrated Campaigns</span>
+      <span class="svc-cap">Looper — Integrated Campaigns</span>
+      <div class="svc-row-tags"><span class="svc-list-label">Includes</span><div class="svc-list"><span>360° Strategy</span><span>Cross-channel Execution</span><span>Reporting</span></div></div>
+    </div>
+
+    <div class="svc-row rv"
+      data-icon="M14 10H34V26L24 38L14 26V10ZM14 18H34"
+      data-icon-label="Print">
+      <span class="svc-row-num">A — 8</span>
+      <div class="svc-meta"><span>Service</span><b>08 / 09</b></div>
+      <span class="svc-row-name">Polygraphy</span>
+      <span class="svc-cap">Looper — Polygraphy</span>
+      <div class="svc-row-tags"><span class="svc-list-label">Includes</span><div class="svc-list"><span>Print Production</span><span>Packaging Design</span><span>Large Format</span></div></div>
+    </div>
+
+    <div class="svc-row rv"
+      data-icon="M10 14L24 28L38 14M24 28V38"
+      data-icon-label="Web">
+      <span class="svc-row-num">A — 9</span>
+      <div class="svc-meta"><span>Service</span><b>09 / 09</b></div>
+      <span class="svc-row-name">Web Development</span>
+      <span class="svc-cap">Looper — Web Development</span>
+      <div class="svc-row-tags"><span class="svc-list-label">Includes</span><div class="svc-list"><span>Web Design</span><span>Development</span><span>SEO</span></div></div>
+    </div>
+
+    <div class="svc-rule" style="margin-top:0"></div>
+  </div>
+  <span class="chapter-label chapter-label-white" id="chap2">Chapter 02</span>
+</div>
+
+<!-- MARQUEE -->
+<div class="marquee-band" aria-hidden="true" data-section="dark">
+  <div class="marquee-track">
+    <span>Social Media</span><span class="dot">∞</span><span>Digital Marketing</span><span class="dot">∞</span><span>Photo & Video</span><span class="dot">∞</span><span>Branding</span><span class="dot">∞</span><span>Motion Design</span><span class="dot">∞</span><span>E-commerce</span><span class="dot">∞</span><span>Web Development</span><span class="dot">∞</span><span>Polygraphy</span><span class="dot">∞</span><span>Social Media</span><span class="dot">∞</span><span>Digital Marketing</span><span class="dot">∞</span><span>Photo & Video</span><span class="dot">∞</span><span>Branding</span><span class="dot">∞</span><span>Motion Design</span><span class="dot">∞</span><span>E-commerce</span><span class="dot">∞</span><span>Web Development</span><span class="dot">∞</span><span>Polygraphy</span><span class="dot">∞</span>
+  </div>
+</div>
+
+<!-- WORK SECTION — Arc carousel gallery -->
+<div class="work-section" id="work" data-section="dark">
+  <!-- Full-section canvas: arc carousel + pixel glitch + neon + floor reflection -->
+  <canvas id="workCanvas"></canvas>
+
+  <!-- Custom cursor -->
+  <div id="workCursor">
+    <div class="wc-inner"></div>
+    <svg class="wc-arrow" viewBox="0 0 16 16" fill="none" width="16" height="16">
+      <path d="M4 8h8M9 5l3 3-3 3" stroke="rgba(255,255,255,0.7)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+
+  <!-- Metadata printed over the hovered card -->
+  <div class="w-pinfo" id="wPinfo"></div>
+
+  <!-- Project info — bottom left -->
+  <div class="work-info-panel" id="workInfoPanel">
+    <h3 class="wip-name" id="wipName"><span class="wip-arrow">&#8627;</span><span id="wipNameText">NABERAULI</span></h3>
+    <p class="wip-desc" id="wipDesc">Cinematic brand story capturing the soul of Georgian craftsmanship — shot on location.</p>
+  </div>
+
+  <!-- Hint — bottom right -->
+  <div class="work-counter">
+    <div class="wc-hint">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v10M6 1L3 4M6 1l3 3M6 11L3 8M6 11l3-3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+      Scroll to explore
+    </div>
+  </div>
+
+  <!-- Tick counter — bottom centre (ticks are built in JS) -->
+  <div class="work-track" id="workTrack">
+    <span class="wt-num" id="wtCur">01</span>
+    <div class="wt-ticks" id="wtTicks"><div class="wt-marker" id="wtMarker"></div></div>
+    <span class="wt-num dim" id="wtTotal">06</span>
+  </div>
+
+  <span class="chapter-label chapter-label-white" id="chap3">Chapter 03</span>
+</div>
+
+<!-- VISUAL STORIES — Scroll-driven diagonal conveyor -->
+<div class="photo-section" id="photoSection" data-section="dark">
+  <!-- sticky viewport -->
+  <div class="photo-pin" id="photoPin">
+
+    <!-- header (stays fixed in top-left while scrolling) -->
+    <div class="photo-header">
+      <p class="sec-eyebrow">Photography</p>
+      <h2 class="sec-title" style="color:var(--white)">Visual Stories<br>We've Told</h2>
+    </div>
+
+    <!-- the diagonal moving rail -->
+    <div class="ph-rail" id="phRail">
+
+      <!-- Card 1 -->
+      <div class="ph-card" data-tilt="-3" id="phc1">
+        <div class="ph-tape"></div>
+        <div class="ph-inner">
+          <canvas id="ph1"></canvas>
+          <div class="ph-lines"></div>
+        </div>
+        <div class="ph-ov"><div class="ph-tag">Outdoor Photography</div><div class="ph-name">2 TONS</div></div>
+        <svg class="ph-doodle" viewBox="0 0 336 392" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- rough hand-drawn border loop -->
+          <path d="M 28 20 Q 90 8 170 14 Q 250 8 310 22 Q 324 50 320 180 Q 326 290 312 368 Q 250 382 170 376 Q 90 382 26 366 Q 12 290 16 180 Q 10 70 28 20 Z" style="--dlen:1100"/>
+          <!-- corner star doodle top-right -->
+          <line x1="296" y1="34" x2="316" y2="14" style="--dlen:30"/>
+          <line x1="316" y1="34" x2="296" y2="14" style="--dlen:30"/>
+          <!-- small arrow bottom-left -->
+          <polyline points="34,342 20,356 34,370" style="--dlen:50"/>
+          <line x1="20" y1="356" x2="60" y2="356" style="--dlen:40"/>
+        </svg>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="ph-card" data-tilt="2" id="phc2">
+        <div class="ph-tape"></div>
+        <div class="ph-inner">
+          <canvas id="ph2"></canvas>
+          <div class="ph-lines"></div>
+        </div>
+        <div class="ph-ov"><div class="ph-tag">New Collection</div><div class="ph-name">ADAMIANI</div></div>
+        <svg class="ph-doodle" viewBox="0 0 336 392" fill="none">
+          <path d="M 32 24 Q 100 10 170 16 Q 240 10 306 24 Q 320 60 318 180 Q 322 300 308 368 Q 240 382 170 376 Q 100 382 30 366 Q 16 300 18 180 Q 14 70 32 24 Z" style="--dlen:1100"/>
+          <!-- circles doodle -->
+          <circle cx="306" cy="38" r="10" style="--dlen:65"/>
+          <circle cx="306" cy="38" r="6" style="--dlen:40"/>
+          <!-- wavy underline at bottom -->
+          <path d="M 40 358 Q 70 352 100 358 Q 130 364 160 358 Q 190 352 220 358 Q 250 364 280 358 Q 300 354 310 358" style="--dlen:290"/>
+        </svg>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="ph-card" data-tilt="-1" id="phc3">
+        <div class="ph-tape"></div>
+        <div class="ph-inner">
+          <canvas id="ph3"></canvas>
+          <div class="ph-lines"></div>
+        </div>
+        <div class="ph-ov"><div class="ph-tag">Product Photography</div><div class="ph-name">LA FARINA</div></div>
+        <svg class="ph-doodle" viewBox="0 0 336 392" fill="none">
+          <path d="M 30 18 Q 95 6 170 12 Q 245 6 308 20 Q 322 55 320 180 Q 326 295 310 370 Q 245 384 170 378 Q 95 384 28 368 Q 14 295 16 180 Q 10 68 30 18 Z" style="--dlen:1100"/>
+          <!-- triple dot top-left corner -->
+          <circle cx="38" cy="28" r="3" style="fill:var(--ink);--dlen:20"/>
+          <circle cx="52" cy="22" r="3" style="fill:var(--ink);--dlen:20"/>
+          <circle cx="66" cy="20" r="3" style="fill:var(--ink);--dlen:20"/>
+          <!-- bracket bottom-right -->
+          <path d="M 300 350 L 316 350 L 316 374 L 300 374" style="--dlen:80"/>
+        </svg>
+      </div>
+
+      <!-- Card 4 -->
+      <div class="ph-card" data-tilt="4" id="phc4">
+        <div class="ph-tape"></div>
+        <div class="ph-inner">
+          <canvas id="ph4"></canvas>
+          <div class="ph-lines"></div>
+        </div>
+        <div class="ph-ov"><div class="ph-tag">Interior Photography</div><div class="ph-name">STRADA</div></div>
+        <svg class="ph-doodle" viewBox="0 0 336 392" fill="none">
+          <path d="M 26 22 Q 92 8 170 14 Q 248 8 312 22 Q 326 58 322 180 Q 328 298 314 370 Q 248 384 170 378 Q 92 384 24 368 Q 10 298 14 180 Q 8 68 26 22 Z" style="--dlen:1100"/>
+          <!-- zigzag top -->
+          <polyline points="60,12 80,22 100,10 120,22 140,10 160,22 180,10 200,22 220,10 240,22 260,10" style="--dlen:280"/>
+          <!-- small heart bottom-left -->
+          <path d="M 36 358 C 36 350 46 345 50 353 C 54 345 64 350 64 358 C 64 366 50 376 50 376 C 50 376 36 366 36 358 Z" style="--dlen:120"/>
+        </svg>
+      </div>
+
+      <!-- Card 5 -->
+      <div class="ph-card" data-tilt="-2" id="phc5">
+        <div class="ph-tape"></div>
+        <div class="ph-inner">
+          <canvas id="ph5"></canvas>
+          <div class="ph-lines"></div>
+        </div>
+        <div class="ph-ov"><div class="ph-tag">Catalog Photography</div><div class="ph-name">SPAR</div></div>
+        <svg class="ph-doodle" viewBox="0 0 336 392" fill="none">
+          <path d="M 28 20 Q 95 7 170 13 Q 245 7 310 21 Q 324 56 320 180 Q 326 294 312 368 Q 245 382 170 376 Q 95 382 26 366 Q 12 294 16 180 Q 10 68 28 20 Z" style="--dlen:1100"/>
+          <!-- spiral top-right -->
+          <path d="M 310 18 C 310 10 300 8 296 14 C 292 20 294 30 302 32 C 312 34 320 24 318 14" style="--dlen:140"/>
+          <!-- diagonal hatch bottom -->
+          <line x1="40" y1="372" x2="60" y2="352" style="--dlen:30"/>
+          <line x1="60" y1="372" x2="80" y2="352" style="--dlen:30"/>
+          <line x1="80" y1="372" x2="100" y2="352" style="--dlen:30"/>
+        </svg>
+      </div>
+
+      <!-- Card 6 -->
+      <div class="ph-card" data-tilt="1" id="phc6">
+        <div class="ph-tape"></div>
+        <div class="ph-inner">
+          <canvas id="ph6"></canvas>
+          <div class="ph-lines"></div>
+        </div>
+        <div class="ph-ov"><div class="ph-tag">Product Photography</div><div class="ph-name">NABERAULI</div></div>
+        <svg class="ph-doodle" viewBox="0 0 336 392" fill="none">
+          <path d="M 30 22 Q 96 8 170 14 Q 244 8 308 22 Q 322 56 318 180 Q 324 294 310 368 Q 244 382 170 376 Q 96 382 28 366 Q 14 294 18 180 Q 12 68 30 22 Z" style="--dlen:1100"/>
+          <!-- star burst top-left -->
+          <line x1="28" y1="20" x2="20" y2="10" style="--dlen:15"/>
+          <line x1="36" y1="14" x2="30" y2="4" style="--dlen:15"/>
+          <line x1="46" y1="12" x2="44" y2="2" style="--dlen:15"/>
+          <!-- exclamation bottom-right -->
+          <line x1="306" y1="348" x2="306" y2="368" style="--dlen:20"/>
+          <circle cx="306" cy="376" r="3" style="fill:var(--ink);--dlen:20"/>
+        </svg>
+      </div>
+
+      <!-- Card 7 -->
+      <div class="ph-card" data-tilt="-4" id="phc7">
+        <div class="ph-tape"></div>
+        <div class="ph-inner">
+          <canvas id="ph7"></canvas>
+          <div class="ph-lines"></div>
+        </div>
+        <div class="ph-ov"><div class="ph-tag">Interior + Outdoor</div><div class="ph-name">SEVSAMORA</div></div>
+        <svg class="ph-doodle" viewBox="0 0 336 392" fill="none">
+          <path d="M 26 20 Q 94 6 170 12 Q 246 6 312 20 Q 326 54 322 180 Q 328 296 314 370 Q 246 384 170 378 Q 94 384 24 368 Q 10 296 14 180 Q 8 66 26 20 Z" style="--dlen:1100"/>
+          <!-- double loop top-right -->
+          <path d="M 300 10 C 318 10 326 24 316 32 C 306 40 294 32 294 20 C 294 8 310 4 318 14" style="--dlen:160"/>
+          <!-- check mark bottom-left -->
+          <polyline points="28,358 42,372 70,342" style="--dlen:80"/>
+        </svg>
+      </div>
+
+      <!-- Card 8 -->
+      <div class="ph-card" data-tilt="3" id="phc8">
+        <div class="ph-tape"></div>
+        <div class="ph-inner">
+          <canvas id="ph8"></canvas>
+          <div class="ph-lines"></div>
+        </div>
+        <div class="ph-ov"><div class="ph-tag">Outdoor Photography</div><div class="ph-name">MIVINO</div></div>
+        <svg class="ph-doodle" viewBox="0 0 336 392" fill="none">
+          <path d="M 32 18 Q 98 6 170 12 Q 242 6 308 20 Q 322 54 318 180 Q 324 294 310 368 Q 242 382 170 376 Q 98 382 30 366 Q 16 294 18 180 Q 12 66 32 18 Z" style="--dlen:1100"/>
+          <!-- arrow loop top -->
+          <path d="M 170 8 C 180 2 196 6 196 14 C 196 22 184 24 176 20 C 168 16 168 6 178 4" style="--dlen:120"/>
+          <line x1="178" y1="4" x2="186" y2="10" style="--dlen:12"/>
+          <!-- parallel lines bottom -->
+          <line x1="40" y1="358" x2="296" y2="358" style="--dlen:260"/>
+          <line x1="40" y1="368" x2="180" y2="368" style="--dlen:140"/>
+        </svg>
+      </div>
+
+      <!-- Card 9 -->
+      <div class="ph-card" data-tilt="-1" id="phc9">
+        <div class="ph-tape"></div>
+        <div class="ph-inner">
+          <canvas id="ph9"></canvas>
+          <div class="ph-lines"></div>
+        </div>
+        <div class="ph-ov"><div class="ph-tag">Catalog Photography</div><div class="ph-name">MERDINI</div></div>
+        <svg class="ph-doodle" viewBox="0 0 336 392" fill="none">
+          <path d="M 28 22 Q 95 8 170 14 Q 245 8 310 22 Q 324 57 320 180 Q 326 295 312 370 Q 245 384 170 378 Q 95 384 26 368 Q 12 295 16 180 Q 10 68 28 22 Z" style="--dlen:1100"/>
+          <!-- diamond top-right -->
+          <path d="M 308 10 L 322 24 L 308 38 L 294 24 Z" style="--dlen:90"/>
+          <!-- wavy arrow bottom left -->
+          <path d="M 70 366 C 60 358 42 362 32 368" style="--dlen:60"/>
+          <polyline points="22,364 32,368 28,378" style="--dlen:30"/>
+        </svg>
+      </div>
+
+    </div><!-- /ph-rail -->
+
+    <!-- scroll hint -->
+    <div class="ph-scroll-hint" id="phScrollHint">
+      <svg width="16" height="8" viewBox="0 0 16 8"><path d="M0 4h14M10 1l4 3-4 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+      Scroll to explore
+    </div>
+
+  </div><!-- /photo-pin -->
+
+  <!-- spacer: JS sets height to control scroll travel -->
+  <div class="photo-spacer" id="photoSpacer"></div>
+</div>
+
+<!-- BRANDING -->
+<div class="brand-section panel-dark" data-section="dark">
+  <div class="brand-inner">
+    <p class="sec-eyebrow rv">Brand Identity</p>
+    <h2 class="sec-title rv">Branding Work</h2>
+    <div class="b-grid">
+      <div class="b-card rv"><div class="b-vis" style="background:linear-gradient(135deg,#160a30,#3a1a7a)"><div class="b-mono" style="color:#c8a2f8">AG</div></div><div class="b-info"><div class="b-lbl">Branding</div><div class="b-nm">ABANOTUBANI GROUP</div></div></div>
+      <div class="b-card rv"><div class="b-vis" style="background:linear-gradient(135deg,#001a10,#004d28)"><div class="b-mono" style="color:#7fe87f">TG</div></div><div class="b-info"><div class="b-lbl">Branding</div><div class="b-nm">TECH GOGO</div></div></div>
+      <div class="b-card rv"><div class="b-vis" style="background:linear-gradient(135deg,#1a0a00,#4d2200)"><div class="b-mono" style="color:#f5c47a">KE</div></div><div class="b-info"><div class="b-lbl">Branding</div><div class="b-nm">KING EREKLE'S BATH</div></div></div>
+    </div>
+  </div>
+  <span class="chapter-label chapter-label-white" id="chap4">Chapter 04</span>
+</div>
+
+<!-- TEAM -->
+<div class="team-section" id="team">
+  <div class="team-inner">
+    <p class="sec-eyebrow rv">The People</p>
+    <h2 class="sec-title rv">Our Team</h2>
+    <div class="t-grid">
+      <div class="t-card"><div class="t-av">ZT</div><div><div class="t-name">Zura Tsiramua</div><div class="t-role">CEO</div><div class="t-links"><a href="https://www.linkedin.com/in/zura-tsiramua-1b270b18b/" target="_blank" rel="noopener">LinkedIn</a><a href="https://www.facebook.com/zura.tsiramua" target="_blank" rel="noopener">Facebook</a></div></div></div>
+      <div class="t-card"><div class="t-av">EE</div><div><div class="t-name">Erekle Eristavi</div><div class="t-role">Strategist</div><div class="t-links"><a href="https://www.linkedin.com/in/erekle-eristavi-900a31145/" target="_blank" rel="noopener">LinkedIn</a><a href="https://www.facebook.com/ekeernie" target="_blank" rel="noopener">Facebook</a></div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="cta-section" id="contact" data-section="dark">
+  <canvas id="ctaCanvas"></canvas>
+  <div class="cta-inner">
+    <p class="sec-eyebrow rv" style="margin-bottom:24px">Get In Touch</p>
+    <h2 class="cta-title rv">LET'S<br><span>LOOP</span><br>TOGETHER</h2>
+    <p class="cta-sub rv">For further information reach us anytime.</p>
+    <div class="cta-contacts rv">
+      <div class="cta-citem"><div class="cta-clabel">Phone</div><div class="cta-cval">(+995) 551 46 84 40</div></div>
+      <div class="cta-citem"><div class="cta-clabel">Email</div><div class="cta-cval">info@looperagency.ge</div></div>
+    </div>
+    <div class="hero-actions"><a class="btn-blue" href="https://www.behance.net/looperagency" target="_blank" rel="noopener">Our Portfolio →</a><a class="btn-out-dark" href="https://looper-open-door-careers.lovable.app/" target="_blank" rel="noopener">View Careers</a></div>
+  </div>
+</div>
+
+<footer>
+  <div class="foot-inner">
+    <div class="foot-logo">LOOPER AGENCY</div>
+    <div class="foot-copy">© 2026 Looper Agency · Marketing Communications Agency · Tbilisi, Georgia</div>
+    <div class="foot-socials">
+      <a href="https://www.facebook.com/LooperAGY/" target="_blank" rel="noopener" aria-label="Facebook"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
+      <a href="https://www.instagram.com/looperagency/" target="_blank" rel="noopener" aria-label="Instagram"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+      <a href="https://www.behance.net/looperagency" target="_blank" rel="noopener" aria-label="Behance"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M22 7h-7V5h7v2zm1.726 10c-.442 1.297-2.029 3-5.101 3-3.074 0-5.564-1.729-5.564-5.675 0-3.91 2.325-5.92 5.466-5.92 3.082 0 4.964 1.782 5.375 4.426.078.506.109 1.188.095 2.14H15.97c.13 3.211 3.483 3.312 4.588 2.029h3.168zm-7.686-4h4.965c-.105-1.547-1.136-2.219-2.477-2.219-1.466 0-2.277.768-2.488 2.219zm-9.574 6.988H0V5.021h6.953c5.476.081 5.58 5.444 2.72 6.906 3.461 1.26 3.577 8.061-3.207 8.061zM3 11h3.584c2.508 0 2.906-3-.312-3H3v3zm3.391 3H3v3.016h3.341c3.055 0 2.868-3.016.05-3.016z"/></svg></a>
+    </div>
+  </div>
+</footer>
+
+<!-- Partner Manager Modal -->
+<div id="partnerManager">
+  <div class="pm-panel">
+    <div class="pm-title">
+      Partner Photos
+      <button class="pm-close" onclick="document.getElementById('partnerManager').classList.remove('open')">× Close</button>
+    </div>
+    <p class="pm-hint">Click any card to upload a photo for that partner</p>
+    <div class="pm-grid" id="pmGrid"></div>
+  </div>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
