@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Account Manager — Internship · Looper Agency</title>
+<meta name="description" content="Work between clients and the creative team and learn account management on live projects, with a mentor.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 28'%3E%3Crect width='44' height='28' fill='%2307080b'/%3E%3Cpath d='M22 14C22 14 17 4 10 4C4.477 4 1 8.477 1 14C1 19.523 4.477 24 10 24C17 24 22 14 22 14ZM22 14C22 14 27 24 34 24C39.523 24 43 19.523 43 14C43 8.477 39.523 4 34 4C27 4 22 14 22 14Z' fill='none' stroke='%230066FF' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Noto+Sans+Georgian:wght@400;500;700&display=swap">
+<style>
+:root{--bg:#07080b;--surface:#0d0f14;--surface-2:#141720;--white:#F3F1EC;--text-2:rgba(243,241,236,.68);--text-3:rgba(243,241,236,.55);--line:rgba(255,255,255,.1);--blue:#0066FF;--violet:#7A5CFF;--r-sm:6px;--r-md:14px;--r-pill:999px;--ease:cubic-bezier(.16,1,.3,1);--gutter:clamp(20px,5.5vw,80px);color-scheme:dark;
+--font-d:'Syne','Noto Sans Georgian',system-ui,sans-serif;--font-b:'DM Sans','Noto Sans Georgian',system-ui,sans-serif;--font-m:'DM Mono',ui-monospace,monospace}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;overflow-x:clip}
+body{font-family:var(--font-b);background:var(--bg);color:var(--white);line-height:1.6;overflow-x:clip;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--blue);outline-offset:3px;border-radius:var(--r-sm)}
+::selection{background:var(--blue);color:#fff}
+#prog{position:fixed;top:0;left:0;right:0;height:2px;z-index:50;transform-origin:0 50%;transform:scaleX(0);background:linear-gradient(90deg,var(--blue),var(--violet))}
+nav{position:fixed;top:0;left:0;right:0;z-index:40;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px var(--gutter);background:rgba(7,8,11,.78);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-bottom:1px solid transparent}
+.logo{display:flex;align-items:center;gap:8px;font-family:var(--font-d);font-weight:800;font-size:1.0625rem;letter-spacing:-.02em;text-decoration:none}
+.nav-r{display:flex;align-items:center;gap:20px}
+.back{font-size:.8125rem;font-weight:500;color:var(--text-2);text-decoration:none;transition:color .2s var(--ease)}
+.back:hover{color:var(--white)}
+.btn{display:inline-flex;align-items:center;gap:8px;font:600 .875rem var(--font-b);color:var(--white);background:var(--blue);padding:12px 24px;border-radius:var(--r-pill);text-decoration:none;border:0;cursor:pointer;transition:background .2s var(--ease),transform .3s var(--ease)}
+.btn:hover{background:#0055dd;transform:translateY(-2px)}
+.btn.ghost{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18)}
+.btn.ghost:hover{background:rgba(255,255,255,.14)}
+.btn.sm{padding:9px 18px;font-size:.8125rem}
+/* hero */
+.hero{position:relative;padding:150px var(--gutter) 72px;overflow:hidden;border-bottom:1px solid var(--line)}
+.hero-art{position:absolute;right:-8%;top:50%;width:min(780px,70vw);transform:translateY(-50%);pointer-events:none;opacity:.55}
+.hero-art use{fill:none;stroke:var(--blue);stroke-width:1.4}
+.hero-art .a{stroke-dasharray:5 11;animation:flow 26s linear infinite}
+.hero-art .b{stroke:var(--violet);opacity:.55;transform-origin:200px 150px;animation:spin 60s linear infinite}
+@keyframes flow{to{stroke-dashoffset:-320}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.wrap{max-width:1400px;margin:0 auto;position:relative}
+.crumbs{display:flex;align-items:center;gap:10px;font:500 .75rem var(--font-m);letter-spacing:.12em;text-transform:uppercase;color:var(--text-3);margin-bottom:28px}
+.crumbs a{text-decoration:none;color:var(--text-2)}.crumbs a:hover{color:var(--white)}
+.badges{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:22px}
+.badge{display:inline-flex;align-items:center;gap:8px;font:600 .6875rem var(--font-b);letter-spacing:.14em;text-transform:uppercase;border:1px solid var(--line);background:rgba(255,255,255,.04);padding:7px 14px;border-radius:var(--r-pill);color:var(--text-2)}
+.badge.live{color:var(--white);border-color:rgba(0,102,255,.5)}
+.badge.live::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--blue);box-shadow:0 0 0 0 rgba(0,102,255,.6);animation:pulse 2s infinite}
+@keyframes pulse{70%{box-shadow:0 0 0 9px rgba(0,102,255,0)}100%{box-shadow:0 0 0 0 rgba(0,102,255,0)}}
+h1{font-family:var(--font-d);font-weight:800;letter-spacing:-.04em;line-height:.98;font-size:clamp(2.6rem,7.4vw,6.5rem);max-width:12ch;text-wrap:balance}
+h1 em{font-style:normal;color:var(--blue)}
+.ka-sub{margin-top:14px;font-size:clamp(1rem,1.6vw,1.25rem);color:var(--text-2);font-weight:500}
+.lead{margin-top:28px;max-width:62ch;font-size:clamp(1rem,1.5vw,1.1875rem);color:var(--text-2);line-height:1.75}
+.meta{display:flex;flex-wrap:wrap;gap:12px 28px;margin-top:32px;font-size:.9375rem;color:var(--text-2)}
+.meta span{display:inline-flex;align-items:center;gap:8px}
+.meta svg{color:var(--blue)}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px;margin-top:36px}
+/* body */
+.body{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:64px;padding:80px var(--gutter) 40px;max-width:calc(1400px + 2*var(--gutter));margin:0 auto;align-items:start}
+section.blk{padding:0 0 64px;margin-bottom:64px;border-bottom:1px solid var(--line)}
+section.blk:last-of-type{border-bottom:0;margin-bottom:0}
+.eyebrow{font:600 .6875rem var(--font-b);letter-spacing:.14em;text-transform:uppercase;color:var(--blue);margin-bottom:14px;display:flex;gap:10px;align-items:center}
+.eyebrow::before{content:'\221E';color:var(--blue);font-size:1.1em;letter-spacing:0}
+h2{font-family:var(--font-d);font-weight:800;letter-spacing:-.03em;line-height:1.1;font-size:clamp(1.6rem,3.2vw,2.5rem);margin-bottom:22px;text-wrap:balance}
+p.t{color:var(--text-2);font-size:1.0625rem;line-height:1.8;max-width:68ch}
+p.t+p.t{margin-top:16px}
+ol.duties{list-style:none;counter-reset:d;display:grid;gap:12px;margin-top:26px}
+ol.duties li{counter-increment:d;display:grid;grid-template-columns:44px 1fr;gap:18px;align-items:start;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:20px 24px;color:var(--text-2);line-height:1.7;transition:border-color .3s var(--ease),transform .4s var(--ease),background .3s}
+ol.duties li::before{content:counter(d,decimal-leading-zero);font:500 .8125rem var(--font-m);color:var(--blue);padding-top:3px}
+ol.duties li:hover{border-color:rgba(0,102,255,.55);transform:translateX(6px);background:var(--surface-2)}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:30px}
+.panel h3{font-family:var(--font-d);font-weight:800;letter-spacing:-.02em;font-size:1.25rem;margin-bottom:18px}
+ul.chk{list-style:none;display:grid;gap:14px}
+ul.chk li{position:relative;padding-left:30px;color:var(--text-2);line-height:1.65}
+ul.chk li::before{content:'';position:absolute;left:0;top:.45em;width:16px;height:16px;border-radius:50%;border:1.5px solid var(--blue);background:radial-gradient(circle,var(--blue) 0 3px,transparent 4px)}
+ul.chk.plus li::before{border-color:var(--violet);background:none;content:'+';display:grid;place-items:center;font:600 .8rem var(--font-b);color:var(--violet);line-height:1}
+.offer{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-top:26px;list-style:none}
+.offer li{background:linear-gradient(160deg,var(--surface),var(--surface-2));border:1px solid var(--line);border-radius:var(--r-md);padding:20px 22px;color:var(--text-2);line-height:1.6;font-size:.9688rem;transition:transform .4s var(--ease),border-color .3s}
+.offer li:hover{transform:translateY(-4px);border-color:rgba(122,92,255,.5)}
+.process{background:linear-gradient(135deg,rgba(0,102,255,.14),rgba(122,92,255,.12));border:1px solid rgba(0,102,255,.3);border-radius:var(--r-md);padding:clamp(24px,4vw,44px)}
+.subject{margin-top:26px;display:flex;flex-wrap:wrap;align-items:center;gap:12px 16px;background:rgba(7,8,11,.55);border:1px solid var(--line);border-radius:var(--r-md);padding:16px 18px}
+.subject small{display:block;font:600 .6875rem var(--font-b);letter-spacing:.14em;text-transform:uppercase;color:var(--text-3);width:100%}
+.subject code{font:500 .9375rem var(--font-m);color:var(--white);flex:1 1 220px;overflow-wrap:anywhere}
+.copy{font:600 .75rem var(--font-b);letter-spacing:.06em;color:var(--white);background:rgba(255,255,255,.08);border:1px solid var(--line);border-radius:var(--r-pill);padding:8px 16px;cursor:pointer;transition:background .2s,border-color .2s}
+.copy:hover{background:rgba(255,255,255,.14);border-color:var(--blue)}
+.mailline{margin-top:18px;color:var(--text-2);font-size:.9375rem}
+.mailline b{color:var(--white);font-weight:600;user-select:all}
+/* side */
+aside{position:sticky;top:88px;display:grid;gap:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:26px}
+.card h4{font:600 .6875rem var(--font-b);letter-spacing:.14em;text-transform:uppercase;color:var(--text-3);margin-bottom:16px}
+.kv{display:grid;gap:14px}
+.kv div{display:flex;justify-content:space-between;gap:12px;font-size:.9375rem;border-bottom:1px solid var(--line);padding-bottom:12px}
+.kv div:last-child{border-bottom:0;padding-bottom:0}
+.kv span{color:var(--text-3)}.kv b{font-weight:600;text-align:right}
+.card .btn{width:100%;justify-content:center;margin-top:18px}
+.others a{display:flex;justify-content:space-between;align-items:center;gap:12px;text-decoration:none;padding:12px 0;border-bottom:1px solid var(--line);color:var(--text-2);transition:color .2s,padding .3s var(--ease)}
+.others a:last-child{border-bottom:0}
+.others a:hover{color:var(--white);padding-left:6px}
+.others small{display:block;color:var(--text-3);font-size:.75rem}
+footer{border-top:1px solid var(--line);padding:40px var(--gutter);display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;color:var(--text-3);font-size:.8125rem}
+footer a{color:var(--text-2);text-decoration:none}footer a:hover{color:var(--white)}
+.rv{opacity:0;transform:translateY(22px);transition:opacity .55s var(--ease),transform .65s var(--ease)}
+.rv.on{opacity:1;transform:none}
+@media(max-width:1000px){.body{grid-template-columns:1fr;gap:32px}aside{position:static}.cols{grid-template-columns:1fr}.hero-art{opacity:.25}}
+@media(max-width:560px){nav .back{display:none}ol.duties li{grid-template-columns:34px 1fr;padding:16px 18px;gap:12px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<div id="prog" aria-hidden="true"></div>
+<nav>
+  <a class="logo" href="../index.html" aria-label="Looper Agency — home"><svg width="22" height="14" viewBox="0 0 44 28" fill="none"><path d="M22 14C22 14 17 4 10 4C4.477 4 1 8.477 1 14C1 19.523 4.477 24 10 24C17 24 22 14 22 14ZM22 14C22 14 27 24 34 24C39.523 24 43 19.523 43 14C43 8.477 39.523 4 34 4C27 4 22 14 22 14Z" stroke="#0066FF" stroke-width="2.5" stroke-linecap="round"/></svg>LOOPER</a>
+  <div class="nav-r"><a class="back" href="../index.html#careers">← All careers</a><a class="btn sm" href="#apply">Apply</a></div>
+</nav>
+
+<header class="hero">
+  <svg class="hero-art" viewBox="0 0 400 300" aria-hidden="true"><defs><path id="lp" d="M370.0 150.0 L368.1 162.9 L362.5 174.9 L353.9 185.1 L343.0 193.2 L330.7 198.7 L317.8 202.0 L304.8 203.0 L292.2 202.3 L280.1 200.0 L268.9 196.5 L258.4 192.2 L248.6 187.1 L239.4 181.5 L230.9 175.6 L222.8 169.4 L215.0 163.0 L207.4 156.5 L200.0 150.0 L192.6 143.5 L185.0 137.0 L177.2 130.6 L169.1 124.4 L160.6 118.5 L151.4 112.9 L141.6 107.8 L131.1 103.5 L119.9 100.0 L107.8 97.7 L95.2 97.0 L82.2 98.0 L69.3 101.3 L57.0 106.8 L46.1 114.9 L37.5 125.1 L31.9 137.1 L30.0 150.0 L31.9 162.9 L37.5 174.9 L46.1 185.1 L57.0 193.2 L69.3 198.7 L82.2 202.0 L95.2 203.0 L107.8 202.3 L119.9 200.0 L131.1 196.5 L141.6 192.2 L151.4 187.1 L160.6 181.5 L169.1 175.6 L177.2 169.4 L185.0 163.0 L192.6 156.5 L200.0 150.0 L207.4 143.5 L215.0 137.0 L222.8 130.6 L230.9 124.4 L239.4 118.5 L248.6 112.9 L258.4 107.8 L268.9 103.5 L280.1 100.0 L292.2 97.7 L304.8 97.0 L317.8 98.0 L330.7 101.3 L343.0 106.8 L353.9 114.9 L362.5 125.1 L368.1 137.1 L370.0 150.0Z"/></defs><use href="#lp" class="a"/><use href="#lp" class="b" transform="scale(.8) translate(50 37.5)"/></svg>
+  <div class="wrap">
+    <p class="crumbs"><a href="../index.html">Looper</a><span>/</span><a href="../index.html#careers">Careers</a><span>/</span><span>Account Manager</span></p>
+    <div class="badges"><span class="badge live">Open · Internship</span><span class="badge">სტაჟირება ღიაა</span></div>
+    <h1>Account <em>Manager</em></h1>
+    <p class="ka-sub">Account Manager პოზიციაზე</p>
+    <p class="lead">ეძებ შესაძლებლობას, სადაც კომუნიკაციისა და ორგანიზების უნარებს რეალურ კლიენტებსა და კამპანიებზე მუშაობისას გამოიყენებ? შემოგვიერთდი Looper Agency-ის გუნდში.</p>
+    <div class="meta"><span><svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><path d='M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z'/><circle cx='12' cy='10' r='2.5'/></svg>Saburtalo, Tbilisi</span><span><svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><circle cx='12' cy='12' r='9'/><path d='M12 7v5l3 2'/></svg>3-month internship</span><span><svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><path d='M20 12v9H4v-9M2 7h20v5H2zM12 22V7M12 7H7.5a2.5 2.5 0 1 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 1 0 0-5C13 2 12 7 12 7z'/></svg>Paid</span></div>
+    <div class="cta-row"><a class="btn" href="#apply">გამოაგზავნე რეზიუმე →</a><a class="btn ghost" href="#about">გაიგე მეტი</a></div>
+  </div>
+</header>
+
+<div class="body">
+  <main>
+    <section class="blk rv" id="about"><p class="eyebrow">About the role</p><h2>სტაჟირების მიზანი — რას მიიღებ სტაჟირებისგან</h2><p class="t">სტაჟირების პროგრამის მიზანია დაგეხმაროს ექაუნთ მენეჯმენტის მიმართულებით პრაქტიკული უნარების განვითარებაში.</p><p class="t">პროგრამა ანაზღაურებადია და 3 თვის განმავლობაში გექნება საშუალება ისწავლო პრაქტიკის განმავლობაში. სტაჟირების დროს იმუშავებ მენტორის მხარდაჭერით, მიიღებ რეგულარულ უკუკავშირს და ეტაპობრივად ჩაერთვები რეალურ პროექტებში.</p></section>
+    <section class="blk rv"><p class="eyebrow">Responsibilities</p><h2>ძირითადი მოვალეობები — სტაჟირების განმავლობაში ჩაერთვები</h2><p class="t">იმუშავებ კლიენტებსა და კრეატიულ გუნდს შორის და დაეხმარები ექაუნთ მენეჯერებს, რომ პროექტები დროულად და მაღალი ხარისხით განხორციელდეს.</p><ol class="duties"><li>დაეხმარები კლიენტებთან ყოველდღიურ კომუნიკაციაში და მათი მოთხოვნების მიღებაში.</li><li>მოამზადებ ბრიფებს და გადასცემ დავალებებს დიზაინერებს, კოპირაითერებსა და სხვა გუნდის წევრებს.</li><li>გააკონტროლებ დედლაინებს, კონტენტ კალენდარსა და დავალებების შესრულებას.</li><li>მოამზადებ შეხვედრების შეჯამებებს, ანგარიშებსა და კამპანიების შედეგების მოკლე მიმოხილვებს.</li><li>შეისწავლი კლიენტების ბიზნესს, კონკურენტებსა და ბაზრის ტრენდებს და შესთავაზებ საკუთარ იდეებს.</li></ol></section>
+    <section class="blk rv"><p class="eyebrow">Who we're looking for</p><h2>ვის ვეძებთ</h2>
+      <div class="cols"><div class="panel"><h3>აუცილებელია გქონდეს</h3><ul class="chk "><li>ქართული ენის შესანიშნავი ცოდნა და ინგლისურის კარგი დონე.</li><li>კომუნიკაციისა და მოლაპარაკების კარგი უნარები.</li><li>ორგანიზებულობა, პასუხისმგებლობა და დროის მართვის უნარი.</li><li>რამდენიმე დავალებაზე ერთდროულად მუშაობის უნარი.</li><li>ინტერესი მარკეტინგის, რეკლამისა და ბრენდების მიმართ.</li></ul></div><div class="panel"><h3>უპირატესობად ჩაითვლება</h3><ul class="chk plus"><li>პროექტის მართვის ინსტრუმენტებთან (Notion, Trello, Asana და სხვ.) მუშაობის გამოცდილება.</li><li>Google Sheets-ის ან Excel-ის საბაზისო ცოდნა.</li><li>SMM-ის ან ციფრული მარკეტინგის საბაზისო ცოდნა, ან სააგენტოში/გუნდურ პროექტებში მუშაობის გამოცდილება.</li></ul></div></div></section>
+    <section class="blk rv"><p class="eyebrow">What we offer</p><h2>რას გთავაზობთ — რას მიიღებ ჩვენთან</h2><ul class="offer"><li>3-თვიან ანაზღაურებად სტაჟირების პროგრამას</li><li>რეალურ კლიენტებთან და ბრენდებთან მუშაობის პრაქტიკულ გამოცდილებას</li><li>გამოცდილ გუნდთან მუშაობასა და პროფესიულ მენტორობას</li><li>რეგულარულ უკუკავშირს და განვითარების შესაძლებლობას</li><li>პროექტის მართვისა და კლიენტებთან კომუნიკაციის რეალურ გამოცდილებას</li><li>სასწავლო განრიგზე მორგებულ სამუშაო გრაფიკს</li><li>მეგობრულ გუნდსა და განვითარებაზე ორიენტირებულ გარემოს</li></ul></section>
+    <section class="blk rv" id="apply"><div class="process"><p class="eyebrow">How we hire</p><p class="t" style="color:var(--white);font-weight:600;margin-bottom:10px">მზად ხარ გახდე ჩვენი გუნდის წევრი?</p><h2>შერჩევის პროცესი და გამოხმაურება</h2><p class="t">შერჩევის პროცესი მოიცავს განაცხადების განხილვას, მოკლე სატესტო დავალებას და გასაუბრებას. გამოაგზავნე CV მისამართზე: info@looperagency.ge (მეილის subject-ში მიუთითე: Account Manager - Internship). სურვილისამებრ 2-3 წინადადებით მოგვიყევი იმაზე, თუ რატომ გაინტერესებს ეს პოზიცია და რა გამოცდილება გაქვს გუნდურ ან ორგანიზებულ პროექტებში. გაითვალისწინე: ჩვენ გვინდა დავინახოთ შენი მოტივაცია, კომუნიკაციის სტილი და პოტენციალი და არა იდეალური ცოდნა ან გამოცდილება.</p>
+      <div class="subject"><small>წერილის სათაური</small><code id="subj">Account Manager - Internship</code><button class="copy" type="button" id="copySubj">Copy subject</button></div>
+      <div class="cta-row"><a class="btn" href="mailto:info@looperagency.ge?subject=Account%20Manager%20-%20Internship">გაგზავნა — info@looperagency.ge</a><a class="btn ghost" href="https://looper-open-door-careers.lovable.app/" target="_blank" rel="noopener">Upload your resume ↗</a></div>
+      <p class="mailline">Email: <b>info@looperagency.ge</b> — or use the upload form, which accepts PDF / Word (max 10&nbsp;MB).</p></div></section>
+  </main>
+  <aside>
+    <div class="card"><h4>Role summary</h4>
+      <div class="kv"><div><span>Role</span><b>Account Manager</b></div><div><span>Type</span><b>Internship</b></div><div><span>Duration</span><b>3-month internship</b></div><div><span>Pay</span><b>Paid</b></div><div><span>Location</span><b>Saburtalo, Tbilisi</b></div></div>
+      <a class="btn" href="#apply">Apply now</a></div>
+    <div class="card others"><h4>Other openings</h4><a href='advertiser.html'><span>Advertiser<small>Vacancy · Full-time</small></span><span aria-hidden='true'>→</span></a><a href='video-content-production-internship.html'><span>Video Content Production<small>Internship · 3-month internship</small></span><span aria-hidden='true'>→</span></a></div>
+  </aside>
+</div>
+<footer><span>© 2026 Looper Agency · Marketing Communications Agency · Tbilisi, Georgia</span><span><a href="../index.html#careers">All careers</a> · <a href="../index.html">Home</a></span></footer>
+<script>
+(function(){
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('on');io.unobserve(e.target)}})},{threshold:.08});
+  document.querySelectorAll('.rv').forEach(function(el){io.observe(el)});
+  var bar=document.getElementById('prog');
+  function p(){var m=document.documentElement.scrollHeight-innerHeight;bar.style.transform='scaleX('+(m>0?Math.min(1,scrollY/m):0)+')'}
+  addEventListener('scroll',p,{passive:true});p();
+  var b=document.getElementById('copySubj'),s=document.getElementById('subj');
+  b.addEventListener('click',function(){
+    function done(){b.textContent='Copied ✓';setTimeout(function(){b.textContent='Copy subject'},1800)}
+    function fallback(){var r=document.createRange();r.selectNodeContents(s);var sel=getSelection();sel.removeAllRanges();sel.addRange(r);done()}
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(s.textContent).then(done,fallback)}else fallback();
+  });
+})();
+</script>
+</body>
+</html>

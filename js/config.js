@@ -49,10 +49,19 @@ window.LOOPER_CONFIG = {
     'images/partners/12'
   ],
 
-  /* The small "Card images" button in the hero lets you try pictures straight
-     from the browser (stored only in your browser). Set to false to hide it
-     for the live site. */
-  showUploader: true,
+  /* The small "Card images" / "Partner logos" buttons let you try pictures straight
+     from the browser (stored only in your browser). They are hidden for visitors.
+     To see them while you work, open the page with  #edit  at the end of the
+     address (e.g. http://127.0.0.1:5500/#edit) or set this to true. */
+  showUploader: false,
+
+  /* 3 pictures for the Branding Work cards (optional). Without them the cards show
+     the animated identity boards. Best size: 1200 x 900 px, landscape. */
+  branding: [
+    'images/branding/01.jpg',
+    'images/branding/02.jpg',
+    'images/branding/03.jpg'
+  ],
 
   /* 9 hover images for "Services We Offer", in the same order as the rows:
      01 Social Media · 02 Digital Marketing · 03 Photo & Video Production

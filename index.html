@@ -3,8 +3,10 @@
 <head>
 <meta charset="utf-8">
 <title>Looper Agency</title>
+<meta name="description" content="Looper is a marketing communications agency in Tbilisi, Georgia — brands, campaigns and digital experiences that move people and businesses forward.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 28'%3E%3Crect width='44' height='28' fill='%2307080b'/%3E%3Cpath d='M22 14C22 14 17 4 10 4C4.477 4 1 8.477 1 14C1 19.523 4.477 24 10 24C17 24 22 14 22 14ZM22 14C22 14 27 24 34 24C39.523 24 43 19.523 43 14C43 8.477 39.523 4 34 4C27 4 22 14 22 14Z' fill='none' stroke='%230066FF' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=DM+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=DM+Mono:wght@400;500&family=Noto+Sans+Georgian:wght@400;500;700&display=swap">
 
 <link rel="stylesheet" href="css/styles.css">
 </head>
@@ -16,6 +18,7 @@
     <div class="loader-pct" id="loaderPct">0<span style="font-size:.5em;opacity:.4">%</span></div>
     <div class="loader-label">Loading experience</div>
   </div>
+  <button class="loader-skip" id="loaderSkip" type="button">Skip intro</button>
 </div>
 
 <!-- NAV -->
@@ -24,22 +27,28 @@
     <svg width="22" height="14" viewBox="0 0 44 28" fill="none"><path d="M22 14C22 14 17 4 10 4C4.477 4 1 8.477 1 14C1 19.523 4.477 24 10 24C17 24 22 14 22 14ZM22 14C22 14 27 24 34 24C39.523 24 43 19.523 43 14C43 8.477 39.523 4 34 4C27 4 22 14 22 14Z" stroke="#0066FF" stroke-width="2.5" stroke-linecap="round"/></svg>
     LOOPER
   </a>
-  <ul class="nav-links">
+  <ul class="nav-links" id="navLinks">
     <li><a href="#services">Services</a></li>
-    <li><a href="#partners">Partners</a></li>
     <li><a href="#work">Work</a></li>
+    <li><a href="#partners">Partners</a></li>
     <li><a href="#team">Team</a></li>
+    <li><a href="#careers">Careers</a></li>
   </ul>
-  <a class="nav-btn" href="#contact">Get in Touch</a>
+  <div class="nav-right">
+    <a class="nav-btn" href="#contact">Start a Project</a>
+    <button class="nav-toggle" id="navToggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="navSheet"><i></i><i></i></button>
+  </div>
 </nav>
-
-<!-- Floating CTA -->
-<a class="float-cta" href="#contact" id="floatCta">
-  <span class="float-cta-icon">
-    <svg width="16" height="16" viewBox="0 0 44 28" fill="none"><path d="M22 14C22 14 17 4 10 4C4.477 4 1 8.477 1 14C1 19.523 4.477 24 10 24C17 24 22 14 22 14ZM22 14C22 14 27 24 34 24C39.523 24 43 19.523 43 14C43 8.477 39.523 4 34 4C27 4 22 14 22 14Z" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>
-  </span>
-  Start a Project
-</a>
+<div class="nav-sheet" id="navSheet" aria-hidden="true">
+  <a class="sheet-link" href="#services">Services</a>
+  <a class="sheet-link" href="#work">Work</a>
+  <a class="sheet-link" href="#partners">Partners</a>
+  <a class="sheet-link" href="#team">Team</a>
+  <a class="sheet-link" href="#careers">Careers</a>
+  <a class="btn-blue sheet-cta" href="#contact">Start a Project</a>
+  <p class="sheet-meta">info@looperagency.ge · (+995) 551 46 84 40</p>
+</div>
+<div id="scrollProgress" aria-hidden="true"></div>
 
 <!-- HERO — DARK, GRAIL-STYLE -->
 <section class="hero" id="home" data-section="dark">
@@ -50,11 +59,11 @@
   <div class="hero-top"><div class="hero-head">
   <p class="hero-eyebrow">Marketing Communications Agency · Tbilisi, Georgia</p>
   <h1 class="hero-title" id="heroTitle">
-    <span class="word" style="animation-delay:.05s">BREAK</span><span style="display:inline"> </span><span class="word blue" style="animation-delay:.2s">THE</span><span style="display:inline"> </span><span class="word" style="animation-delay:.35s" aria-label="LOOP">L<span class="inf-o" aria-hidden="true"><svg viewBox="0 0 100 48" focusable="false"><path d="M50 24C42 8 31 5.5 22 5.5C11 5.5 5.5 14 5.5 24C5.5 34 11 42.5 22 42.5C31 42.5 42 40 50 24C58 8 69 5.5 78 5.5C89 5.5 94.5 14 94.5 24C94.5 34 89 42.5 78 42.5C69 42.5 58 40 50 24Z"/></svg></span>P</span>
+    <span class="word" style="animation-delay:.02s">BREAK</span><span style="display:inline"> </span><span class="word blue" style="animation-delay:.1s">THE</span><span style="display:inline"> </span><span class="word" style="animation-delay:.18s" aria-label="LOOP">L<span class="inf-o" aria-hidden="true"><svg viewBox="0 0 100 48" focusable="false"><path d="M50 24C42 8 31 5.5 22 5.5C11 5.5 5.5 14 5.5 24C5.5 34 11 42.5 22 42.5C31 42.5 42 40 50 24C58 8 69 5.5 78 5.5C89 5.5 94.5 14 94.5 24C94.5 34 89 42.5 78 42.5C69 42.5 58 40 50 24Z"/></svg></span>P</span>
   </h1>
   </div><!-- /hero-head -->
   </div><!-- /hero-top -->
-  <button class="pm-open" id="pmOpen" type="button" onclick="window.openPartnerManager&&window.openPartnerManager()">▣ Card images</button>
+  <button class="pm-open" id="pmOpen" type="button" hidden onclick="window.openPartnerManager&&window.openPartnerManager()">▣ Card images</button>
   <div class="scroll-hint">
     <span>Scroll</span>
     <svg width="14" height="20" viewBox="0 0 14 20" fill="none"><rect x="1" y="1" width="12" height="18" rx="6" stroke="white" stroke-opacity=".25" stroke-width="1.5"/><rect x="6" y="4" width="2" height="5" rx="1" fill="white" fill-opacity=".25"><animate attributeName="y" values="4;8;4" dur="1.8s" repeatCount="indefinite"/></rect></svg>
@@ -77,14 +86,13 @@
   <div class="statement-inner">
     <p class="sec-eyebrow rv" style="color:var(--blue);margin-bottom:28px">What We Believe</p>
     <h2 class="statement-title" id="stmtTitle">
-      <span class="sl" data-line="0">GREAT BRANDS</span><br>
-      <span class="sl" data-line="1">AREN'T BUILT</span><br>
+      <span class="sl" data-line="0">GREAT BRANDS</span>
+      <span class="sl" data-line="1">AREN'T BUILT</span>
       <span class="sl" data-line="2">THEY'RE <span class="blue">LOOPED</span></span>
     </h2>
     <p class="statement-sub">Every campaign, every identity, every pixel — an infinite loop of strategy, creativity, and impact. Five years. 102+ partners. Zero compromises.</p>
   </div>
-  <span class="chapter-label chapter-label-white" id="chap1">Chapter 01</span>
-  <span class="chapter-label-left chapter-label-white" id="chap1l">What We Believe</span>
+  <span class="chapter-label chapter-label-white">Chapter 01</span>
 </section>
 
 <!-- SERVICES — Signal-style row list -->
@@ -107,7 +115,7 @@
         <p class="sec-eyebrow rv">What We Do</p>
         <h2 class="sec-title rv">Services<br>We Offer</h2>
       </div>
-      <a class="btn-blue rv" href="#contact">Work With Us →</a>
+      <a class="btn-blue rv" href="#contact">Start a Project</a>
     </div>
 
     <div class="svc-rule"></div>
@@ -205,7 +213,7 @@
 
     <div class="svc-rule" style="margin-top:0"></div>
   </div>
-  <span class="chapter-label chapter-label-white" id="chap2">Chapter 02</span>
+  <span class="chapter-label chapter-label-white">Chapter 02</span>
 </div>
 
 <!-- MARQUEE -->
@@ -222,7 +230,8 @@
   <!-- Full-section canvas: arc carousel + pixel glitch + neon + floor reflection -->
   <canvas id="workCanvas"></canvas>
 
-  <!-- Custom cursor -->
+  <div class="pin-prog" aria-hidden="true"><i></i></div>
+  <!-- Custom cursor (hidden: native cursor is used site-wide) -->
   <div id="workCursor">
     <div class="wc-inner"></div>
     <svg class="wc-arrow" viewBox="0 0 16 16" fill="none" width="16" height="16">
@@ -254,14 +263,29 @@
     <span class="wt-num dim" id="wtTotal">06</span>
   </div>
 
-  <span class="chapter-label chapter-label-white" id="chap3">Chapter 03</span>
+  <span class="chapter-label chapter-label-white">Chapter 03</span>
 </div><!-- /work pin -->
 </div><!-- /work-wrap -->
+
+<!-- PARTNERS — collage of partner logos -->
+<section class="partners-section" id="partners" data-section="dark">
+  <div class="pt-copy">
+    <p class="sec-eyebrow">Our Partners</p>
+    <h2 class="pt-title">Brands that<br>trust the <em>loop</em></h2>
+    <p class="pt-sub">From banks and universities to retail and dining — 102+ local partners rely on Looper to tell their story.</p>
+    <a class="btn-blue" href="#contact">Start a Project</a>
+  </div>
+  <div class="pt-stage" id="ptStage"></div>
+  <button class="pt-open" id="ptOpen" type="button" hidden>▣ Partner logos</button>
+  <span class="chapter-label chapter-label-white">Chapter 04</span>
+</section>
 
 <!-- VISUAL STORIES — Scroll-driven diagonal conveyor -->
 <div class="photo-section" id="photoSection" data-section="dark">
   <!-- sticky viewport -->
   <div class="photo-pin" id="photoPin">
+  <span class="chapter-label chapter-label-white">Chapter 05</span>
+    <div class="pin-prog" aria-hidden="true"><i></i></div>
 
     <!-- header (stays fixed in top-left while scrolling) -->
     <div class="photo-header">
@@ -454,33 +478,68 @@
 </div>
 
 <!-- BRANDING -->
-<div class="brand-section panel-dark" data-section="dark">
+<div class="brand-section panel-dark" id="branding" data-section="dark">
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><path id="bLoopPath" d="M370.0 150.0 L368.1 162.9 L362.5 174.9 L353.9 185.1 L343.0 193.2 L330.7 198.7 L317.8 202.0 L304.8 203.0 L292.2 202.3 L280.1 200.0 L268.9 196.5 L258.4 192.2 L248.6 187.1 L239.4 181.5 L230.9 175.6 L222.8 169.4 L215.0 163.0 L207.4 156.5 L200.0 150.0 L192.6 143.5 L185.0 137.0 L177.2 130.6 L169.1 124.4 L160.6 118.5 L151.4 112.9 L141.6 107.8 L131.1 103.5 L119.9 100.0 L107.8 97.7 L95.2 97.0 L82.2 98.0 L69.3 101.3 L57.0 106.8 L46.1 114.9 L37.5 125.1 L31.9 137.1 L30.0 150.0 L31.9 162.9 L37.5 174.9 L46.1 185.1 L57.0 193.2 L69.3 198.7 L82.2 202.0 L95.2 203.0 L107.8 202.3 L119.9 200.0 L131.1 196.5 L141.6 192.2 L151.4 187.1 L160.6 181.5 L169.1 175.6 L177.2 169.4 L185.0 163.0 L192.6 156.5 L200.0 150.0 L207.4 143.5 L215.0 137.0 L222.8 130.6 L230.9 124.4 L239.4 118.5 L248.6 112.9 L258.4 107.8 L268.9 103.5 L280.1 100.0 L292.2 97.7 L304.8 97.0 L317.8 98.0 L330.7 101.3 L343.0 106.8 L353.9 114.9 L362.5 125.1 L368.1 137.1 L370.0 150.0Z"/></defs></svg>
   <div class="brand-inner">
-    <p class="sec-eyebrow rv">Brand Identity</p>
-    <h2 class="sec-title rv">Branding Work</h2>
-    <div class="b-grid">
-      <div class="b-card rv"><div class="b-vis" style="background:linear-gradient(135deg,#160a30,#3a1a7a)"><div class="b-mono" style="color:#c8a2f8">AG</div></div><div class="b-info"><div class="b-lbl">Branding</div><div class="b-nm">ABANOTUBANI GROUP</div></div></div>
-      <div class="b-card rv"><div class="b-vis" style="background:linear-gradient(135deg,#001a10,#004d28)"><div class="b-mono" style="color:#7fe87f">TG</div></div><div class="b-info"><div class="b-lbl">Branding</div><div class="b-nm">TECH GOGO</div></div></div>
-      <div class="b-card rv"><div class="b-vis" style="background:linear-gradient(135deg,#1a0a00,#4d2200)"><div class="b-mono" style="color:#f5c47a">KE</div></div><div class="b-info"><div class="b-lbl">Branding</div><div class="b-nm">KING EREKLE'S BATH</div></div></div>
+    <div class="section-head">
+      <div>
+        <p class="sec-eyebrow rv">Brand Identity</p>
+        <h2 class="sec-title rv">Branding Work</h2>
+      </div>
+      <p class="section-lead rv">Identities built from the first sketch to the final guideline — the mark, the colour, the type and the rules that hold them together.</p>
     </div>
+    <div class="b-grid">
+      <article class="b-card rv" style="--hue:250;transition-delay:0s">
+        <div class="b-tilt">
+          <div class="b-vis">
+            <i class="b-orb"></i><i class="b-orb o2"></i>
+            <svg class="b-loops" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><use href="#bLoopPath" class="l3"/><use href="#bLoopPath" class="l2"/><use href="#bLoopPath" class="l1"/></svg>
+            <span class="b-glow"></span>
+            <span class="b-idx">01 / 03</span><span class="b-kind">&infin; Identity</span>
+            <div class="b-mono" aria-hidden="true">AG</div>
+            <div class="b-chips" aria-hidden="true"><i></i><i></i><i></i></div>
+            <span class="b-aa" style="font-family:var(--font-d)" aria-hidden="true">Aa</span>
+          </div>
+          <div class="b-info"><div class="b-lbl">Logo · Identity · Guidelines</div><div class="b-nm">ABANOTUBANI GROUP</div><span class="b-line" aria-hidden="true"></span></div>
+        </div>
+      </article>
+      <article class="b-card rv" style="--hue:218;transition-delay:0.08s">
+        <div class="b-tilt">
+          <div class="b-vis">
+            <i class="b-orb"></i><i class="b-orb o2"></i>
+            <svg class="b-loops" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><use href="#bLoopPath" class="l3"/><use href="#bLoopPath" class="l2"/><use href="#bLoopPath" class="l1"/></svg>
+            <span class="b-glow"></span>
+            <span class="b-idx">02 / 03</span><span class="b-kind">&infin; Identity</span>
+            <div class="b-mono" aria-hidden="true">TG</div>
+            <div class="b-chips" aria-hidden="true"><i></i><i></i><i></i></div>
+            <span class="b-aa" style="font-family:var(--font-b)" aria-hidden="true">Aa</span>
+          </div>
+          <div class="b-info"><div class="b-lbl">Logo · Colour · Type</div><div class="b-nm">TECH GOGO</div><span class="b-line" aria-hidden="true"></span></div>
+        </div>
+      </article>
+      <article class="b-card rv" style="--hue:238;transition-delay:0.16s">
+        <div class="b-tilt">
+          <div class="b-vis">
+            <i class="b-orb"></i><i class="b-orb o2"></i>
+            <svg class="b-loops" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><use href="#bLoopPath" class="l3"/><use href="#bLoopPath" class="l2"/><use href="#bLoopPath" class="l1"/></svg>
+            <span class="b-glow"></span>
+            <span class="b-idx">03 / 03</span><span class="b-kind">&infin; Identity</span>
+            <div class="b-mono" aria-hidden="true">KE</div>
+            <div class="b-chips" aria-hidden="true"><i></i><i></i><i></i></div>
+            <span class="b-aa" style="font-family:var(--font-m)" aria-hidden="true">Aa</span>
+          </div>
+          <div class="b-info"><div class="b-lbl">Logo · Packaging · Signage</div><div class="b-nm">KING EREKLE'S BATH</div><span class="b-line" aria-hidden="true"></span></div>
+        </div>
+      </article>
+    </div>
+    <div class="b-strip" aria-hidden="true"><div class="b-strip-track"><span>Logo systems</span><span>Colour palettes</span><span>Typography</span><span>Brand guidelines</span><span>Packaging</span><span>Stationery</span><span>Social templates</span><span>Signage</span><span>Logo systems</span><span>Colour palettes</span><span>Typography</span><span>Brand guidelines</span><span>Packaging</span><span>Stationery</span><span>Social templates</span><span>Signage</span></div></div>
   </div>
-  <span class="chapter-label chapter-label-white" id="chap4">Chapter 04</span>
+  <span class="chapter-label chapter-label-white">Chapter 06</span>
 </div>
 
-<!-- PARTNERS — collage of partner logos -->
-<section class="partners-section" id="partners" data-section="dark">
-  <div class="pt-copy">
-    <p class="sec-eyebrow">Our Partners</p>
-    <h2 class="pt-title">Brands that<br>trust the <em>loop</em></h2>
-    <p class="pt-sub">From banks and universities to retail and dining — 102+ local partners rely on Looper to tell their story.</p>
-    <a class="btn-blue" href="#contact">Start a Project</a>
-  </div>
-  <div class="pt-stage" id="ptStage"></div>
-  <button class="pt-open" id="ptOpen" type="button">▣ Partner logos</button>
-</section>
-
 <!-- TEAM -->
-<div class="team-section" id="team">
+<div class="team-section" id="team" data-section="dark">
+  <span class="chapter-label chapter-label-white">Chapter 07</span>
   <div class="team-inner">
     <p class="sec-eyebrow rv">The People</p>
     <h2 class="sec-title rv">Our Team</h2>
@@ -491,9 +550,55 @@
   </div>
 </div>
 
+<!-- CAREERS -->
+<section class="careers-section" id="careers" data-section="dark">
+  <span class="chapter-label chapter-label-white">Chapter 08</span>
+  <div class="careers-inner">
+    <div class="section-head">
+      <div>
+        <p class="sec-eyebrow rv">Careers</p>
+        <h2 class="sec-title rv">Join the loop</h2>
+      </div>
+      <p class="section-lead rv">A small, creative team in Saburtalo, Tbilisi, working with real brands. Pick an open role below — or send us your CV and we'll be in touch when something fits.</p>
+    </div>
+    <div class="c-grid">
+      <a class="c-card rv" href="careers/advertiser.html" style="--d:0.00s" aria-label="Advertiser — Vacancy">
+        <svg class="c-art" viewBox="0 0 400 300" aria-hidden="true"><use href="#bLoopPath"/></svg>
+        <div class="c-top"><span class="c-kind"><i></i>Vacancy</span><span class="c-num">01</span></div>
+        <h3 class="c-title">Advertiser</h3>
+        <p class="c-text">Plan, launch and optimise digital ad campaigns on Meta Ads and Google Ads for real brands.</p>
+        <ul class="c-meta"><li>Saburtalo, Tbilisi</li><li>Full-time</li></ul>
+        <span class="c-go">View role <b aria-hidden="true">→</b></span>
+      </a>
+      <a class="c-card rv" href="careers/account-manager-internship.html" style="--d:0.07s" aria-label="Account Manager — Internship">
+        <svg class="c-art" viewBox="0 0 400 300" aria-hidden="true"><use href="#bLoopPath"/></svg>
+        <div class="c-top"><span class="c-kind"><i></i>Internship</span><span class="c-num">02</span></div>
+        <h3 class="c-title">Account Manager</h3>
+        <p class="c-text">Work between clients and the creative team and learn account management on live projects, with a mentor.</p>
+        <ul class="c-meta"><li>Saburtalo, Tbilisi</li><li>3-month internship</li><li>Paid</li></ul>
+        <span class="c-go">View role <b aria-hidden="true">→</b></span>
+      </a>
+      <a class="c-card rv" href="careers/video-content-production-internship.html" style="--d:0.14s" aria-label="Video Content Production — Internship">
+        <svg class="c-art" viewBox="0 0 400 300" aria-hidden="true"><use href="#bLoopPath"/></svg>
+        <div class="c-top"><span class="c-kind"><i></i>Internship</span><span class="c-num">03</span></div>
+        <h3 class="c-title">Video Content Production</h3>
+        <p class="c-text">Follow video content from idea to shoot — and, if you like, into post-production — on real brand projects.</p>
+        <ul class="c-meta"><li>Saburtalo, Tbilisi</li><li>3-month internship</li><li>Paid</li></ul>
+        <span class="c-go">View role <b aria-hidden="true">→</b></span>
+      </a>
+    </div>
+    <div class="c-open rv">
+      <div><h3>Don't see your role?</h3><p>Leave your resume (PDF or Word) and we'll reach out when a matching position opens.</p></div>
+      <div class="c-open-actions"><a class="btn-blue" href="https://looper-open-door-careers.lovable.app/" target="_blank" rel="noopener">Leave your resume ↗</a><a class="btn-out-dark" href="mailto:info@looperagency.ge">info@looperagency.ge</a></div>
+    </div>
+  </div>
+</section>
+
 <!-- CTA -->
 <div class="cta-section" id="contact" data-section="dark">
   <canvas id="ctaCanvas"></canvas>
+  <span class="chapter-label chapter-label-white">Chapter 09</span>
+
   <div class="cta-inner">
     <p class="sec-eyebrow rv" style="margin-bottom:24px">Get In Touch</p>
     <h2 class="cta-title rv">LET'S<br><span>LOOP</span><br>TOGETHER</h2>
@@ -502,19 +607,38 @@
       <div class="cta-citem"><div class="cta-clabel">Phone</div><div class="cta-cval">(+995) 551 46 84 40</div></div>
       <div class="cta-citem"><div class="cta-clabel">Email</div><div class="cta-cval">info@looperagency.ge</div></div>
     </div>
-    <div class="hero-actions"><a class="btn-blue" href="https://www.behance.net/looperagency" target="_blank" rel="noopener">Our Portfolio →</a><a class="btn-out-dark" href="https://looper-open-door-careers.lovable.app/" target="_blank" rel="noopener">View Careers</a></div>
+    <div class="hero-actions"><a class="btn-blue" href="https://www.behance.net/looperagency" target="_blank" rel="noopener">View our work ↗</a><a class="btn-out-dark" href="#careers">Careers</a></div>
   </div>
 </div>
 
 <footer>
   <div class="foot-inner">
-    <div class="foot-logo">LOOPER AGENCY</div>
-    <div class="foot-copy">© 2026 Looper Agency · Marketing Communications Agency · Tbilisi, Georgia</div>
-    <div class="foot-socials">
+    <div class="foot-brand">
+      <div class="foot-logo">LOOPER AGENCY</div>
+      <p class="foot-tag">Brands, campaigns and digital experiences that move people and businesses forward.</p>
+    </div>
+    <div class="foot-col" role="navigation" aria-label="Footer">
+      <h4>Explore</h4>
+      <a href="#services">Services</a><a href="#work">Work</a><a href="#partners">Partners</a><a href="#team">Team</a><a href="#careers">Careers</a>
+    </div>
+    <div class="foot-col">
+      <h4>Contact</h4>
+      <a href="tel:+995551468440">(+995) 551 46 84 40</a>
+      <a href="mailto:info@looperagency.ge">info@looperagency.ge</a>
+      <span>Tbilisi, Georgia</span>
+    </div>
+    <div class="foot-col">
+      <h4>Follow</h4>
+      <div class="foot-socials">
       <a href="https://www.facebook.com/LooperAGY/" target="_blank" rel="noopener" aria-label="Facebook"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
       <a href="https://www.instagram.com/looperagency/" target="_blank" rel="noopener" aria-label="Instagram"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
       <a href="https://www.behance.net/looperagency" target="_blank" rel="noopener" aria-label="Behance"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M22 7h-7V5h7v2zm1.726 10c-.442 1.297-2.029 3-5.101 3-3.074 0-5.564-1.729-5.564-5.675 0-3.91 2.325-5.92 5.466-5.92 3.082 0 4.964 1.782 5.375 4.426.078.506.109 1.188.095 2.14H15.97c.13 3.211 3.483 3.312 4.588 2.029h3.168zm-7.686-4h4.965c-.105-1.547-1.136-2.219-2.477-2.219-1.466 0-2.277.768-2.488 2.219zm-9.574 6.988H0V5.021h6.953c5.476.081 5.58 5.444 2.72 6.906 3.461 1.26 3.577 8.061-3.207 8.061zM3 11h3.584c2.508 0 2.906-3-.312-3H3v3zm3.391 3H3v3.016h3.341c3.055 0 2.868-3.016.05-3.016z"/></svg></a>
     </div>
+    </div>
+  </div>
+  <div class="foot-bottom">
+    <span class="foot-copy">© 2026 Looper Agency · Marketing Communications Agency</span>
+    <a class="foot-top" href="#home">Back to top ↑</a>
   </div>
 </footer>
 

@@ -25,8 +25,13 @@ function savePartners(arr){
 let partners = loadPartners().slice(0,10);
 
 /* ── Image config (set in js/config.js when running as a project; empty here) ── */
-const LOOPER_CFG = window.LOOPER_CONFIG || {heroCards:[],services:[],partners:[],cardBack:'',showUploader:true};
-const pmOpenBtn = document.getElementById('pmOpen'); if(pmOpenBtn && LOOPER_CFG.showUploader===false) pmOpenBtn.hidden = true;
+const LOOPER_CFG = window.LOOPER_CONFIG || {heroCards:[],services:[],partners:[],cardBack:'',showUploader:false};
+/* one accent system: every hue in the site is remapped into the blue → violet range */
+const BV = h => 212 + ((((h%360)+360)%360)/360)*60;
+/* uploader buttons are developer tools: shown only with #edit / ?edit in the URL (or showUploader:true in js/config.js) */
+const EDIT_MODE = /(^|[#?&])edit(\b|=)/.test(location.hash+location.search) || LOOPER_CFG.showUploader===true;
+document.documentElement.classList.toggle('edit-mode', EDIT_MODE);
+const pmOpenBtn = document.getElementById('pmOpen'); if(pmOpenBtn) pmOpenBtn.hidden = !EDIT_MODE;
 
 /* shared helper: shrink uploads so they fit in localStorage */
 function fileToDataUrl(file, maxSide, cb){
@@ -150,31 +155,41 @@ partners.forEach((p,i)=>{ const src = (LOOPER_CFG.heroCards||[])[i]; if(src) p.p
     ctx.shadowBlur=0;
   }
 
-  const DRAW_MS = reduce?10:2400, HOLD_MS=reduce?10:380, ZOOM_MS=reduce?10:1650;
-  const t0=performance.now();
-  let phase=0, tPhase=t0;
+  /* timing: tied to the real page load (never faster than the drawing, never waiting forever),
+     shorter on repeat visits, instant with reduced motion, skippable at any time */
+  let seen=false; try{ seen = sessionStorage.getItem('looper_seen')==='1'; }catch(e){}
+  const DRAW_MS = reduce?10:(seen?600:1500), HOLD_MS = reduce?10:(seen?0:220), ZOOM_MS = reduce?10:(seen?750:1150);
+  if(seen||reduce) loader.classList.add('fast');
+  let ready = document.readyState==='complete';
+  if(!ready){ window.addEventListener('load',()=>{ready=true},{once:true}); setTimeout(()=>{ready=true},5000); }
+  let k=1;                                   // time multiplier: raised when the visitor skips
+  const skipBtn=document.getElementById('loaderSkip');
+  function skip(){ k=6; ready=true; }
+  if(skipBtn) skipBtn.addEventListener('click',skip);
+  ['keydown','wheel','touchstart'].forEach(ev=>window.addEventListener(ev,skip,{passive:true,once:true}));
+  let phase=0, phT=0, pp=0, last=performance.now();
   function easeIO(p){return p<.5?4*p*p*p:1-Math.pow(-2*p+2,3)/2}
   function loop(now){
+    const dt=Math.min(now-last,64)*k; last=now;
     if(phase===0){
-      const p=Math.min((now-t0)/DRAW_MS,1);
-      const e=1-Math.pow(1-p,2.2)*0.85-(1-p)*0.15;   // quick start, gentle finish
-      const prog=p<1?Math.min(Math.max(e,0),1):1;
+      pp=Math.min(pp+dt/DRAW_MS, ready?1:0.9);   // waits at 90% until the page has really loaded
+      const e=1-Math.pow(1-pp,2.2)*0.85-(1-pp)*0.15;   // quick start, gentle finish
+      const prog=pp<1?Math.min(Math.max(e,0),1):1;
       pctEl.innerHTML=Math.round(prog*100)+'<span style="font-size:.5em;opacity:.4">%</span>';
       frame(true,prog,0);
-      if(p>=1){phase=1;tPhase=now;}
+      if(pp>=1){phase=1;phT=0;}
     }else if(phase===1){
-      // hold, the closed loop breathes
       frame(true,1,0);
-      if(now-tPhase>=HOLD_MS){phase=2;tPhase=now;loader.classList.add('zooming');document.body.classList.add('loaded');}
+      phT+=dt;
+      if(phT>=HOLD_MS){phase=2;phT=0;loader.classList.add('zooming');document.body.classList.add('loaded');}
     }else if(phase===2){
-      const p=Math.min((now-tPhase)/ZOOM_MS,1);
-      const z=easeIO(p);
-      frame(true,1,z);
-      // cross-fade the very end so nothing pops
+      phT+=dt;
+      const p=Math.min(phT/ZOOM_MS,1);
+      frame(true,1,easeIO(p));
       canvas.style.opacity=p>0.9?String(1-(p-0.9)/0.1):'1';
       if(p>=1){
         loader.classList.add('done');
-        const cta=document.getElementById('floatCta');if(cta)cta.classList.add('visible');
+        try{ sessionStorage.setItem('looper_seen','1'); }catch(e){}
         return;
       }
     }
@@ -192,24 +207,65 @@ partners.forEach((p,i)=>{ const src = (LOOPER_CFG.heroCards||[])[i]; if(src) p.p
   function update(){
     const scrolled = window.scrollY > 60;
     nav.classList.toggle('scrolled', scrolled);
-    // Switch to light nav once past the hero section
-    // sections are stacked (each new page slides over the last), so ask the browser
-    // which page is actually painted under the nav bar instead of comparing rects
-    const list = document.elementsFromPoint(window.innerWidth/2, 36);
-    let top = null;
-    for(const e of list){
-      if(e.closest('nav,#floatCta,#partnerManager,#logoManager,#loader')) continue;
-      top = e.closest('.stack'); if(top) break;
-    }
-    if(top) nav.classList.toggle('on-light', !top.matches('[data-section="dark"]'));
   }
   window.addEventListener('scroll', update, {passive:true});
   update();
 })();
 
+
+/* ═══════════════════════════════════════════════════════════
+   NAV EXTRAS: mobile menu, scroll-spy, scroll progress
+═══════════════════════════════════════════════════════════ */
+(function(){
+  const nav=document.getElementById('mainNav'), toggle=document.getElementById('navToggle'), sheet=document.getElementById('navSheet');
+  const root=document.documentElement;
+  function setOpen(o){
+    if(!toggle||!sheet) return;
+    sheet.classList.toggle('open',o); toggle.setAttribute('aria-expanded',String(o));
+    toggle.setAttribute('aria-label',o?'Close menu':'Open menu'); sheet.setAttribute('aria-hidden',String(!o));
+    root.style.overflow=o?'hidden':'';
+  }
+  if(toggle){
+    toggle.addEventListener('click',()=>setOpen(!sheet.classList.contains('open')));
+    sheet.addEventListener('click',e=>{ if(e.target.closest('a')) setOpen(false); });
+    window.addEventListener('keydown',e=>{ if(e.key==='Escape') setOpen(false); });
+    window.addEventListener('resize',()=>{ if(window.innerWidth>768) setOpen(false); });
+  }
+  /* scroll-spy — pages are stacked, so use the zero-height markers at each page's natural position */
+  const order=['services','work','partners','photoSection','branding','team','careers','contact'];
+  const links=[...document.querySelectorAll('.nav-links a,.sheet-link')];
+  const bar=document.getElementById('scrollProgress');
+  const pins=[...document.querySelectorAll('.pin-prog')].map(el=>({i:el.querySelector('i'),wrap:el.closest('.work-wrap,.photo-section')}));
+  let cur='';
+  function spy(){
+    const m=window._marks; if(!m) return;
+    const y=window.innerHeight*0.5; let act='';
+    order.forEach(id=>{ const el=m[id]; if(el && el.getBoundingClientRect().top<=y) act=id; });
+    if(act!==cur){
+      cur=act;
+      links.forEach(a=>{ const on=a.getAttribute('href')==='#'+act; a.classList.toggle('active',on); if(on) a.setAttribute('aria-current','true'); else a.removeAttribute('aria-current'); });
+    }
+  }
+  function progress(){
+    const doc=document.documentElement, max=doc.scrollHeight-window.innerHeight;
+    if(bar) bar.style.transform='scaleX('+(max>0?Math.min(1,window.scrollY/max):0).toFixed(4)+')';
+    pins.forEach(p=>{
+      if(!p.wrap||!p.i) return;
+      const r=p.wrap.getBoundingClientRect(), span=r.height-window.innerHeight;
+      const v=span>0?Math.max(0,Math.min(1,-r.top/span)):0;
+      p.i.style.transform='scaleX('+v.toFixed(4)+')';
+    });
+  }
+  function onScroll(){ spy(); progress(); }
+  window.addEventListener('scroll',onScroll,{passive:true});
+  window.addEventListener('resize',onScroll,{passive:true});
+  window.addEventListener('load',onScroll);
+  setTimeout(onScroll,300);
+})();
+
 /* ── PAGE STACK ── */
 (function(){
-  const els=[...document.querySelectorAll('#home,#statsBand,#about,#services,.marquee-band,#workWrap,#photoSection,.brand-section,#partners,#team,#contact,body>footer')];
+  const els=[...document.querySelectorAll('#home,#statsBand,#about,#services,.marquee-band,#workWrap,#photoSection,.brand-section,#partners,#team,#careers,#contact,body>footer')];
   if(!els.length) return;
   const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion:reduce)').matches;
   els.forEach((el,i)=>{
@@ -234,24 +290,81 @@ partners.forEach((p,i)=>{ const src = (LOOPER_CFG.heroCards||[])[i]; if(src) p.p
       if(Math.abs(op-a._op)>0.004){ a._op=op; a._shade.style.opacity=op.toFixed(3); }
     }
   }
-  layout(); shade();
-  window.addEventListener('resize',()=>{layout();shade();},{passive:true});
-  window.addEventListener('scroll',shade,{passive:true});
+  /* a page that is off-screen, or completely covered by the page above it, is not "live":
+     its canvas / animation loops idle instead of drawing frames nobody can see */
+  function live(){
+    const vh=window.innerHeight, rs=els.map(e=>e.getBoundingClientRect());
+    els.forEach((e,i)=>{
+      const r=rs[i]; let covered=false;
+      for(let j=i+1;j<els.length;j++){ const q=rs[j]; if(q.top<=1 && q.bottom>=vh-1){covered=true;break;} }
+      e._live = r.bottom>0 && r.top<vh && !covered;
+    });
+  }
+  window.stackLive = el=>{ const s=el&&el.closest&&el.closest('.stack'); return !s || s._live!==false; };
+  let liveQueued=false;
+  function tickAll(){ shade(); if(!liveQueued){ liveQueued=true; requestAnimationFrame(()=>{liveQueued=false;live();}); } }
+  layout(); shade(); live();
+  window.addEventListener('resize',()=>{layout();shade();live();},{passive:true});
+  window.addEventListener('scroll',tickAll,{passive:true});
   window.addEventListener('load',()=>{layout();shade();});
   if(window.ResizeObserver){ const ro=new ResizeObserver(()=>{layout();shade();}); els.forEach(el=>ro.observe(el)); }
   window._stackEls = els;
+
+  /* ── in-page links: pages are stacked/sticky, so a plain #hash jump can land on the wrong spot.
+        Every page gets a zero-height marker at its natural position in the flow; links scroll to that. ── */
+  const marks = {};
+  els.forEach(el=>{
+    if(!el.id) return;
+    if(el.id==='workWrap'){ marks.work = document.getElementById('workAnchor'); return; }
+    const m=document.createElement('div'); m.style.cssText='height:0;pointer-events:none'; m.setAttribute('aria-hidden','true');
+    el.parentNode.insertBefore(m, el); marks[el.id]=m;
+  });
+  window._marks = marks;
+  /* arriving with #hash (e.g. back from a careers page): land exactly on that page, not the sticky element's raw offset */
+  function jumpHash(){ const id=location.hash.slice(1); if(id && marks[id]){ window.scrollTo(0, Math.round(marks[id].getBoundingClientRect().top+window.scrollY)); } }
+  window.addEventListener('load',()=>{ jumpHash(); setTimeout(jumpHash,350); });
+  document.addEventListener('click',e=>{
+    const a=e.target.closest && e.target.closest('a[href^="#"]');
+    if(!a) return;
+    const id=a.getAttribute('href').slice(1);
+    const m=marks[id];
+    if(!m) return;
+    e.preventDefault();
+    const top = m.getBoundingClientRect().top + window.scrollY;
+    window.scrollTo({top:Math.round(top), behavior:'smooth'});
+  });
 })();
 
-/* Floating CTA dark-section detection */
+
+/* ═══════════════════════════════════════════════════════════
+   SMOOTH WHEEL SCROLL — mouse-wheel steps glide to a stop instead of jumping.
+   Touch, keyboard, scrollbar and anchor links keep their native behaviour.
+═══════════════════════════════════════════════════════════ */
 (function(){
-  const btn=document.getElementById('floatCta');
-  function update(){
-    const y=window.scrollY+window.innerHeight/2;
-    const hero=document.getElementById('home');
-    const hBottom=hero?hero.offsetTop+hero.offsetHeight:0;
-    // On hero: CTA is blue (default), no extra class needed
+  if(window.matchMedia && (matchMedia('(prefers-reduced-motion:reduce)').matches || matchMedia('(pointer:coarse)').matches)) return;
+  let target=window.scrollY, cur=target, active=false, last=0, raf=0;
+  const maxY=()=>document.documentElement.scrollHeight-window.innerHeight;
+  function stop(){ active=false; if(raf) cancelAnimationFrame(raf); raf=0; target=cur=window.scrollY; }
+  function loop(now){
+    const dt=Math.min(now-last,50); last=now;
+    cur += (target-cur)*(1-Math.pow(1-0.13,dt/16.667));
+    if(Math.abs(target-cur)<0.5){ cur=target; active=false; raf=0; window.scrollTo(0,cur); return; }
+    window.scrollTo(0,cur);
+    raf=requestAnimationFrame(loop);
   }
-  window.addEventListener('scroll',update,{passive:true});
+  window.addEventListener('wheel',e=>{
+    if(e.ctrlKey||e.defaultPrevented||Math.abs(e.deltaX)>Math.abs(e.deltaY)) return;
+    if(document.documentElement.style.overflow==='hidden') return;
+    if(e.target.closest && e.target.closest('.pm-panel,.lm-modal,#partnerManager,#logoManager,#navSheet,textarea,input,select')) return;
+    e.preventDefault();
+    let dy=e.deltaY; if(e.deltaMode===1) dy*=34; else if(e.deltaMode===2) dy*=window.innerHeight;
+    if(!active){ target=cur=window.scrollY; }
+    target=Math.max(0,Math.min(maxY(),target+dy));
+    if(!active){ active=true; last=performance.now(); raf=requestAnimationFrame(loop); }
+  },{passive:false});
+  window.addEventListener('scroll',()=>{ if(!active){ target=cur=window.scrollY; } },{passive:true});
+  ['pointerdown','keydown','touchstart'].forEach(t=>window.addEventListener(t,stop,{capture:true,passive:true}));
+  document.addEventListener('click',e=>{ if(e.target.closest && e.target.closest('a[href^="#"]')) stop(); },true);
 })();
 
 /* ═══════════════════════════════════════════════════════════
@@ -271,7 +384,7 @@ partners.forEach((p,i)=>{ const src = (LOOPER_CFG.heroCards||[])[i]; if(src) p.p
   layer.appendChild(ring);
   const lerp=(a,b,t)=>a+(b-a)*t, clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
   const ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
-  function hueFromX(nx){ return nx<.5 ? lerp(28,240,nx*2) : lerp(240,280,(nx-.5)*2); }  // same mapping as Chapter 03
+  function hueFromX(nx){ return nx<.5 ? lerp(212,240,nx*2) : lerp(240,272,(nx-.5)*2); }  // same mapping as Chapter 03
 
   const BACK_SVG = `<svg width="52" height="32" viewBox="0 0 44 28" fill="none"><path d="M22 14C22 14 17 4 10 4C4.477 4 1 8.477 1 14C1 19.523 4.477 24 10 24C17 24 22 14 22 14ZM22 14C22 14 27 24 34 24C39.523 24 43 19.523 43 14C43 8.477 39.523 4 34 4C27 4 22 14 22 14Z" stroke="#0066FF" stroke-width="2.5" stroke-linecap="round"/></svg><div class="back-label">LOOPER</div>`;
 
@@ -293,7 +406,7 @@ partners.forEach((p,i)=>{ const src = (LOOPER_CFG.heroCards||[])[i]; if(src) p.p
 
     const front = document.createElement('div');
     front.className = 'orbit-card-front';
-    front.style.background = `linear-gradient(160deg,hsl(${cfg[i].hue} 38% 24%) 0%,hsl(${(cfg[i].hue+30)%360} 45% 9%) 100%)`;
+    front.style.background = `linear-gradient(160deg,hsl(${BV(cfg[i].hue)} 38% 24%) 0%,hsl(${BV(cfg[i].hue)+12} 45% 9%) 100%)`;
     const photoDiv = document.createElement('div');
     photoDiv.className = 'card-photo';
     const img = document.createElement('img');
@@ -369,7 +482,7 @@ partners.forEach((p,i)=>{ const src = (LOOPER_CFG.heroCards||[])[i]; if(src) p.p
     if(window.scrollY > heroH*1.15){ requestAnimationFrame(frame); return; }
 
     // hit-test every 3rd frame (cheap): which front-facing card is under the pointer?
-    if(frameNo++ % 3 === 0){
+    if(frameNo++ % 2 === 0){
       let best=-1, bestA=999;
       if(mIn && collect<0.25){
         for(let i=0;i<N;i++){
@@ -378,6 +491,11 @@ partners.forEach((p,i)=>{ const src = (LOOPER_CFG.heroCards||[])[i]; if(src) p.p
           const r = cardEls[i].getBoundingClientRect();
           if(mX>=r.left && mX<=r.right && mY>=r.top && mY<=r.bottom && a<bestA){ best=i; bestA=a; }
         }
+      }
+      /* sticky hover: the popped card grows, so keep it while the pointer is still near it (no flicker at the edge) */
+      if(best<0 && hovered>=0 && mIn && collect<0.25){
+        const r=cardEls[hovered].getBoundingClientRect(), m=18;
+        if(mX>=r.left-m && mX<=r.right+m && mY>=r.top-m && mY<=r.bottom+m) best=hovered;
       }
       hovered = best;
     }
@@ -567,22 +685,15 @@ partners.forEach((p,i)=>{ const src = (LOOPER_CFG.heroCards||[])[i]; if(src) p.p
   checkLines();
 })();
 
-/* Chapter corners */
+/* Chapter corners — each label shows while its own section is on screen */
 (function(){
-  const pairs=[
-    {section:'about',   labels:['chap1','chap1l']},
-    {section:'services',labels:['chap2']},
-    {section:'work',    labels:['chap3']},
-    {section:'contact', labels:['chap4']},
-  ];
   const ioC=new IntersectionObserver(entries=>{
-    entries.forEach(e=>{
-      const pair=pairs.find(p=>p.section===e.target.id);
-      if(!pair) return;
-      pair.labels.forEach(lid=>{const el=document.getElementById(lid);if(el) el.classList.toggle('vis',e.isIntersecting)});
-    });
+    entries.forEach(e=>{ e.target.querySelectorAll('.chapter-label,.chapter-label-left').forEach(el=>el.classList.toggle('vis',e.isIntersecting)); });
   },{threshold:0.15});
-  pairs.forEach(p=>{const el=document.getElementById(p.section);if(el) ioC.observe(el)});
+  document.querySelectorAll('.chapter-label').forEach(l=>{
+    const host=l.closest('.photo-section,.partners-section,.brand-section,.team-section,.careers-section,.cta-section,.statement-section,.services-section,.work-wrap')||l.parentElement;
+    if(host && !host._chapObs){ host._chapObs=1; ioC.observe(host); }
+  });
 })();
 
 /* Stats band reveal */
@@ -680,7 +791,8 @@ partners.forEach((p,i)=>{ const src = (LOOPER_CFG.heroCards||[])[i]; if(src) p.p
     const src = (LOOPER_CFG.services||[])[i];
     if(!src) return;
     const probe = new Image();
-    probe.onload = ()=>{ imgOk[i] = src; row.dataset.hasImg = '1'; };
+    probe.onload = ()=>{ imgOk[i] = src; row.dataset.hasImg = '1';
+      const t=document.createElement('img'); t.className='svc-thumb'; t.alt=''; t.loading='lazy'; t.src=src; row.appendChild(t); };
     probe.onerror = ()=>{ /* file missing: fall back to the icon cursor */ };
     probe.src = src;
   });
@@ -758,7 +870,7 @@ function drawPhCanvas(id,pal){
     ctx.fillStyle=pal.bg;ctx.fillRect(0,0,w,h);
     for(let i=0;i<4;i++){
       const rg=ctx.createRadialGradient(w*(0.2+i*0.22),h*(0.15+Math.sin(i*1.5)*0.3),0,w*(0.2+i*0.22),h*(0.15+Math.sin(i*1.5)*0.3),w*0.4);
-      rg.addColorStop(0,`hsla(${pal.hue+i*25},70%,50%,0.55)`);
+      rg.addColorStop(0,`hsla(${BV(pal.hue)+i*10},70%,50%,0.55)`);
       rg.addColorStop(1,'rgba(0,0,0,0)');
       ctx.fillStyle=rg;ctx.fillRect(0,0,w,h);
     }
@@ -769,7 +881,7 @@ function drawPhCanvas(id,pal){
         const y=h/2+Math.sin((x*0.03)+(j*1.3)+(id.charCodeAt(2)*0.5))*(25+j*14)*Math.sin(x/w*Math.PI);
         x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
       }
-      ctx.strokeStyle=`hsla(${pal.hue+j*10},80%,65%,0.22)`;
+      ctx.strokeStyle=`hsla(${BV(pal.hue)+j*4},80%,65%,0.22)`;
       ctx.lineWidth=1.5;ctx.stroke();
     }
     // "photo paper" noise — fast random dots
@@ -784,7 +896,7 @@ function drawPhCanvas(id,pal){
   paint();
   new ResizeObserver(paint).observe(c);
 }
-PH_PALETTES.forEach((pal,i)=>drawPhCanvas('ph'+(i+1),pal));
+PH_PALETTES.forEach((pal,i)=>{ pal.bg=`hsl(${BV(pal.hue)} 45% 6%)`; drawPhCanvas('ph'+(i+1),pal); });
 
 /* ── Apply static tilts ── */
 document.querySelectorAll('.ph-card[data-tilt]').forEach(card=>{
@@ -970,7 +1082,7 @@ document.querySelectorAll('.ph-card').forEach(card=>{
   io.observe(section);
 
   /* parallax + accent hue (same mouse→hue map as Chapter 03) */
-  let mx=0,my=0,tmx=0,tmy=0,vis=false,raf=0, hue=28;
+  let mx=0,my=0,tmx=0,tmy=0,vis=false,raf=0, hue=212;
   new IntersectionObserver(es=>{ vis = es[0].isIntersecting; if(vis && !raf) raf=requestAnimationFrame(loop); },{threshold:0}).observe(section);
   section.addEventListener('mousemove',e=>{
     const r=section.getBoundingClientRect();
@@ -980,11 +1092,12 @@ document.querySelectorAll('.ph-card').forEach(card=>{
   const narrow = ()=>window.innerWidth<=820;
   function loop(){
     raf=0; if(!vis) return;
+    if(window.stackLive && !window.stackLive(section)){ raf=requestAnimationFrame(loop); return; }
     mx=lerp(mx,tmx,.07); my=lerp(my,tmy,.07);
     const r=section.getBoundingClientRect(), vh=window.innerHeight;
     const t=clamp((r.top+r.height/2-vh/2)/vh,-1.2,1.2);
     const nx=clamp(mx+.5,0,1);
-    hue=lerp(hue, nx<.5?lerp(28,240,nx*2):lerp(240,280,(nx-.5)*2), .08);
+    hue=lerp(hue, nx<.5?lerp(212,240,nx*2):lerp(240,272,(nx-.5)*2), .08);
     stage.style.setProperty('--accent', hue.toFixed(0));
     if(!narrow()){
       tiles.forEach(tile=>{
@@ -998,7 +1111,7 @@ document.querySelectorAll('.ph-card').forEach(card=>{
 
   /* uploader */
   const openBtn=document.getElementById('ptOpen'), modal=document.getElementById('logoManager'), grid=document.getElementById('lmGrid');
-  if(window.LOOPER_CONFIG && window.LOOPER_CONFIG.showUploader===false && openBtn) openBtn.hidden=true;
+  if(openBtn) openBtn.hidden = !EDIT_MODE;
   function fileToLogo(file, cb){
     if(/svg/.test(file.type)){ const fr=new FileReader(); fr.onload=e=>cb(e.target.result); fr.readAsDataURL(file); return; }
     const fr=new FileReader();
@@ -1097,17 +1210,17 @@ let glitchUntil=0,glitchNext=0,glitchBand=[0.3,0.1],glitchDX=8;
 function makeCardBuffer(p,w,h){
   const oc=document.createElement('canvas');oc.width=w;oc.height=h;
   const ctx=oc.getContext('2d');
-  const hue=p.hue,sat=p.sat;
+  const hue=BV(p.hue),sat=p.sat;
   const g=ctx.createLinearGradient(0,0,w,h);
   g.addColorStop(0,`hsl(${hue},${sat}%,8%)`);
-  g.addColorStop(.45,`hsl(${hue+18},${sat+5}%,14%)`);
-  g.addColorStop(1,`hsl(${hue+36},${sat}%,7%)`);
+  g.addColorStop(.45,`hsl(${hue+8},${sat+5}%,14%)`);
+  g.addColorStop(1,`hsl(${hue+14},${sat}%,7%)`);
   ctx.fillStyle=g;ctx.fillRect(0,0,w,h);
   // radial blobs
   for(let i=0;i<5;i++){
     const rg=ctx.createRadialGradient(w*(0.15+i*0.18),h*(0.2+Math.sin(i*1.9)*0.25),0,w*(0.15+i*0.18),h*(0.2+Math.sin(i*1.9)*0.25),w*0.32);
-    rg.addColorStop(0,`hsla(${hue+i*35},80%,55%,${0.09+i*0.015})`);
-    rg.addColorStop(1,`hsla(${hue+i*35},80%,55%,0)`);
+    rg.addColorStop(0,`hsla(${hue+i*8},80%,55%,${0.09+i*0.015})`);
+    rg.addColorStop(1,`hsla(${hue+i*8},80%,55%,0)`);
     ctx.fillStyle=rg;ctx.fillRect(0,0,w,h);
   }
   // wave lines
@@ -1118,7 +1231,7 @@ function makeCardBuffer(p,w,h){
       const y=h/2+Math.sin((x*0.025)+(j*1.1)+(idx2*1.7))*(30+j*18)*Math.sin(x/w*Math.PI);
       x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
     }
-    ctx.strokeStyle=`hsla(${hue+j*12},100%,65%,${0.045+j*0.012})`;
+    ctx.strokeStyle=`hsla(${hue+j*4},100%,65%,${0.045+j*0.012})`;
     ctx.lineWidth=1.5;ctx.stroke();
   }
   // accent trace
@@ -1161,10 +1274,10 @@ function lerpAngle(a,b,t){
 function clamp(v,lo,hi){return Math.max(lo,Math.min(hi,v));}
 
 /* ── Accent colour from mouse X ── */
-// left → orange(28), center → blue(240), right → purple(280)
+// left → azure(212), center → blue(240), right → violet(272)
 function mouseXToHue(nx){
-  if(nx<0.5) return lerp(28,240,nx*2);
-  return lerp(240,280,(nx-0.5)*2);
+  if(nx<0.5) return lerp(212,240,nx*2);
+  return lerp(240,272,(nx-0.5)*2);
 }
 function hueToRgb(h,s,l){
   s/=100;l/=100;
@@ -1285,11 +1398,11 @@ function drawCard(ctx,buf,cx,cy,scale,alpha,isCenter,accentHue,mouseNX,mouseNY,e
   const baseGlow=isCenter?0.95:clamp(1-Math.abs(scale-1)*1.8,0.1,0.6);
   const glowAlpha=Math.min(1,baseGlow+hv*0.5);
   const borderW=(isCenter?2.5:1.2)+hv*1.6;
-  const hue=hv>0.01?lerpAngle(accentHue,315,hv*0.45):accentHue;
+  const hue=hv>0.01?lerpAngle(accentHue,272,hv*0.45):accentHue;
   ctx.save();
   ctx.globalAlpha=alpha*glowAlpha;
   ctx.shadowColor=accentCSS(hue,isCenter?0.9:0.5+hv*0.4);
-  ctx.shadowBlur=Math.round((isCenter?32:14)*scale*(1+hv*0.9));
+  ctx.shadowBlur=(isCenter||hv>0.02||scale>0.8)?Math.round((isCenter?32:14)*scale*(1+hv*0.9)):0;   // glow only where it can be seen (it is the costliest canvas call)
   ctx.strokeStyle=accentCSS(hue,isCenter?0.9:0.5+hv*0.4);
   ctx.lineWidth=borderW;
   cardPath(ctx,x,y,cw,ch,r,dxL,dxR);
@@ -1391,6 +1504,7 @@ function renderPinfo(i){
 const wCursorEl=document.getElementById('workCursor');
 let t0=0;
 function render(ts){
+  if(window.stackLive && !window.stackLive(document.getElementById('workWrap'))){ t0=ts; requestAnimationFrame(render); return; }
   const dt=Math.min((ts-t0)/1000,0.05);t0=ts;
 
   // lerp index towards target
@@ -1565,7 +1679,7 @@ SEC&&SEC.addEventListener('mousemove',e=>{
     mouseVel=Math.min(1.5,mouseVel+d/70);
     if(Math.hypot(nx-lastTrailX,ny-lastTrailY)>7){
       trail.push({x:nx,y:ny,vx:(nx-lastTrailX)*0.15,vy:(ny-lastTrailY)*0.15,life:1});
-      if(trail.length>46)trail.shift();
+      if(trail.length>30)trail.shift();
       lastTrailX=nx;lastTrailY=ny;
     }
   }
@@ -1608,8 +1722,11 @@ function makeInfLoop(canvasId,color){
   const ctx=canvas.getContext('2d');let W,H,t=0;
   function resize(){W=canvas.width=canvas.offsetWidth;H=canvas.height=canvas.offsetHeight}
   resize();window.addEventListener('resize',resize);
-  function frame(){
-    ctx.clearRect(0,0,W,H);t+=.004;
+  let lastT=performance.now();
+  function frame(now){
+    now=now||performance.now(); const dtS=Math.min((now-lastT)/16.667,3); lastT=now;
+    if(window.stackLive && !window.stackLive(canvas)){ requestAnimationFrame(frame); return; }
+    ctx.clearRect(0,0,W,H);t+=.004*dtS;
     const cx=W/2,cy=H/2,A=Math.min(W,H)*.42,B=Math.min(W,H)*.18;
     for(let ring=0;ring<3;ring++){
       const sc=.65+ring*.18;
@@ -1639,14 +1756,15 @@ makeInfLoop('ctaCanvas','rgba(0,102,255,1)');
 /* Photo placeholders */
 const phHues=[160,210,30,260,10,140,190,50,300];
 function drawPH(id,hue){
+  hue=BV(hue);
   const c=document.getElementById(id);if(!c)return;
   const p=c.parentElement;c.width=p.offsetWidth||300;c.height=p.offsetHeight||375;
   const ctx=c.getContext('2d'),w=c.width,h=c.height;
   const gr=ctx.createLinearGradient(0,0,w,h);
-  gr.addColorStop(0,`hsl(${hue},40%,88%)`);gr.addColorStop(.5,`hsl(${hue+15},45%,78%)`);gr.addColorStop(1,`hsl(${hue-10},50%,65%)`);
+  gr.addColorStop(0,`hsl(${hue},40%,17%)`);gr.addColorStop(.5,`hsl(${hue+8},45%,12%)`);gr.addColorStop(1,`hsl(${hue-6},50%,8%)`);
   ctx.fillStyle=gr;ctx.fillRect(0,0,w,h);
-  for(let i=0;i<4;i++){const rg=ctx.createRadialGradient(w*(.2+i*.2),h*(.1+i*.22),0,w*(.2+i*.2),h*(.1+i*.22),w*.3);rg.addColorStop(0,`hsla(${hue+i*40},60%,55%,0.18)`);rg.addColorStop(1,`hsla(${hue+i*40},60%,55%,0)`);ctx.fillStyle=rg;ctx.fillRect(0,0,w,h)}
-  ctx.strokeStyle=`hsla(${hue},30%,40%,0.08)`;ctx.lineWidth=1;
+  for(let i=0;i<4;i++){const rg=ctx.createRadialGradient(w*(.2+i*.2),h*(.1+i*.22),0,w*(.2+i*.2),h*(.1+i*.22),w*.3);rg.addColorStop(0,`hsla(${hue+i*10},60%,55%,0.18)`);rg.addColorStop(1,`hsla(${hue+i*10},60%,55%,0)`);ctx.fillStyle=rg;ctx.fillRect(0,0,w,h)}
+  ctx.strokeStyle=`hsla(${hue},40%,70%,0.08)`;ctx.lineWidth=1;
   for(let x=0;x<w;x+=30){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke()}
   for(let y=0;y<h;y+=30){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke()}
 }
@@ -1656,3 +1774,34 @@ let rt;
 window.addEventListener('resize',()=>{
   clearTimeout(rt);rt=setTimeout(()=>{for(let i=1;i<=6;i++) drawVT('vt'+i,i);for(let i=1;i<=9;i++) drawPH('ph'+i,phHues[i-1])},150);
 });
+
+/* ═══════════════════════════════════════════════════════════
+   CARDS: pointer spotlight (branding + careers), 3D tilt (branding), optional photos
+═══════════════════════════════════════════════════════════ */
+(function(){
+  const fine = window.matchMedia && matchMedia('(hover:hover) and (pointer:fine)').matches && !matchMedia('(prefers-reduced-motion:reduce)').matches;
+  document.querySelectorAll('.b-card,.c-card').forEach((c,idx)=>{
+    const isB = c.classList.contains('b-card');
+    if(fine){
+      let raf=0, px=.5, py=.5;
+      c.addEventListener('pointermove',e=>{
+        const r=c.getBoundingClientRect(); px=(e.clientX-r.left)/r.width; py=(e.clientY-r.top)/r.height;
+        if(raf) return;
+        raf=requestAnimationFrame(()=>{
+          raf=0;
+          c.style.setProperty('--mx',(px*100).toFixed(1)+'%'); c.style.setProperty('--my',(py*100).toFixed(1)+'%');
+          if(isB){ c.style.setProperty('--ry',((px-.5)*10).toFixed(2)+'deg'); c.style.setProperty('--rx',((.5-py)*8).toFixed(2)+'deg'); c.style.setProperty('--px',(px-.5).toFixed(3)); c.style.setProperty('--py',(py-.5).toFixed(3)); }
+        });
+      },{passive:true});
+      c.addEventListener('pointerleave',()=>{ if(isB){ c.style.setProperty('--rx','0deg'); c.style.setProperty('--ry','0deg'); c.style.setProperty('--px','0'); c.style.setProperty('--py','0'); } });
+    }
+  });
+  /* real brand pictures: js/config.js → branding:[ 'images/branding/01.jpg', … ] (missing files are fine) */
+  document.querySelectorAll('.b-card').forEach((c,i)=>{
+    const src=(LOOPER_CFG.branding||[])[i]; if(!src) return;
+    const im=new Image(); im.alt=''; im.className='b-photo';
+    im.onload=()=>{ c.querySelector('.b-vis').prepend(im); c.classList.add('has-photo'); };
+    im.src=src;
+  });
+})();
+
