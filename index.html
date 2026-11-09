@@ -6,6 +6,10 @@
 <meta name="description" content="Looper is a marketing communications agency in Tbilisi, Georgia — brands, campaigns and digital experiences that move people and businesses forward.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 28'%3E%3Crect width='44' height='28' fill='%2307080b'/%3E%3Cpath d='M22 14C22 14 17 4 10 4C4.477 4 1 8.477 1 14C1 19.523 4.477 24 10 24C17 24 22 14 22 14ZM22 14C22 14 27 24 34 24C39.523 24 43 19.523 43 14C43 8.477 39.523 4 34 4C27 4 22 14 22 14Z' fill='none' stroke='%230066FF' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script id="themeBoot">
+/* Dark only. LOOPER_THEME is kept as a constant so the canvases can read the stage colour. */
+(function(){document.documentElement.setAttribute('data-theme','dark');window.LOOPER_THEME={light:false,stage:'#06040e',stageRGB:'6,4,14'};})();
+</script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=DM+Mono:wght@400;500&family=Noto+Sans+Georgian:wght@400;500;700&display=swap">
 
 <link rel="stylesheet" href="css/styles.css">
@@ -84,7 +88,7 @@
 <section class="statement-section" id="about" data-section="dark">
   <canvas id="infCanvas"></canvas>
   <div class="statement-inner">
-    <p class="sec-eyebrow rv" style="color:var(--blue);margin-bottom:28px">What We Believe</p>
+    <p class="sec-eyebrow rv" style="color:var(--accent-ink);margin-bottom:28px">What We Believe</p>
     <h2 class="statement-title" id="stmtTitle">
       <span class="sl" data-line="0">GREAT BRANDS</span>
       <span class="sl" data-line="1">AREN'T BUILT</span>
@@ -92,7 +96,6 @@
     </h2>
     <p class="statement-sub">Every campaign, every identity, every pixel — an infinite loop of strategy, creativity, and impact. Five years. 102+ partners. Zero compromises.</p>
   </div>
-  <span class="chapter-label chapter-label-white">Chapter 01</span>
 </section>
 
 <!-- SERVICES — Signal-style row list -->
@@ -213,7 +216,6 @@
 
     <div class="svc-rule" style="margin-top:0"></div>
   </div>
-  <span class="chapter-label chapter-label-white">Chapter 02</span>
 </div>
 
 <!-- MARQUEE -->
@@ -231,6 +233,10 @@
   <canvas id="workCanvas"></canvas>
 
   <div class="pin-prog" aria-hidden="true"><i></i></div>
+  <div class="work-head">
+    <p class="sec-eyebrow">Selected Projects</p>
+    <h2 class="sec-title">Our Work</h2>
+  </div>
   <!-- Custom cursor (hidden: native cursor is used site-wide) -->
   <div id="workCursor">
     <div class="wc-inner"></div>
@@ -263,7 +269,6 @@
     <span class="wt-num dim" id="wtTotal">06</span>
   </div>
 
-  <span class="chapter-label chapter-label-white">Chapter 03</span>
 </div><!-- /work pin -->
 </div><!-- /work-wrap -->
 
@@ -277,14 +282,12 @@
   </div>
   <div class="pt-stage" id="ptStage"></div>
   <button class="pt-open" id="ptOpen" type="button" hidden>▣ Partner logos</button>
-  <span class="chapter-label chapter-label-white">Chapter 04</span>
 </section>
 
 <!-- VISUAL STORIES — Scroll-driven diagonal conveyor -->
 <div class="photo-section" id="photoSection" data-section="dark">
   <!-- sticky viewport -->
   <div class="photo-pin" id="photoPin">
-  <span class="chapter-label chapter-label-white">Chapter 05</span>
     <div class="pin-prog" aria-hidden="true"><i></i></div>
 
     <!-- header (stays fixed in top-left while scrolling) -->
@@ -534,12 +537,10 @@
     </div>
     <div class="b-strip" aria-hidden="true"><div class="b-strip-track"><span>Logo systems</span><span>Colour palettes</span><span>Typography</span><span>Brand guidelines</span><span>Packaging</span><span>Stationery</span><span>Social templates</span><span>Signage</span><span>Logo systems</span><span>Colour palettes</span><span>Typography</span><span>Brand guidelines</span><span>Packaging</span><span>Stationery</span><span>Social templates</span><span>Signage</span></div></div>
   </div>
-  <span class="chapter-label chapter-label-white">Chapter 06</span>
 </div>
 
 <!-- TEAM -->
 <div class="team-section" id="team" data-section="dark">
-  <span class="chapter-label chapter-label-white">Chapter 07</span>
   <div class="team-inner">
     <p class="sec-eyebrow rv">The People</p>
     <h2 class="sec-title rv">Our Team</h2>
@@ -552,14 +553,12 @@
 
 <!-- CAREERS -->
 <section class="careers-section" id="careers" data-section="dark">
-  <span class="chapter-label chapter-label-white">Chapter 08</span>
   <div class="careers-inner">
     <div class="section-head">
       <div>
         <p class="sec-eyebrow rv">Careers</p>
         <h2 class="sec-title rv">Join the loop</h2>
       </div>
-      <p class="section-lead rv">A small, creative team in Saburtalo, Tbilisi, working with real brands. Pick an open role below — or send us your CV and we'll be in touch when something fits.</p>
     </div>
     <div class="c-grid">
       <a class="c-card rv" href="careers/advertiser.html" style="--d:0.00s" aria-label="Advertiser — Vacancy">
@@ -589,7 +588,7 @@
     </div>
     <div class="c-open rv">
       <div><h3>Don't see your role?</h3><p>Leave your resume (PDF or Word) and we'll reach out when a matching position opens.</p></div>
-      <div class="c-open-actions"><a class="btn-blue" href="https://looper-open-door-careers.lovable.app/" target="_blank" rel="noopener">Leave your resume ↗</a><a class="btn-out-dark" href="mailto:info@looperagency.ge">info@looperagency.ge</a></div>
+      <div class="c-open-actions"><a class="btn-blue" href="careers/resume.html">Leave your resume →</a><a class="btn-out-dark" href="mailto:info@looperagency.ge">info@looperagency.ge</a></div>
     </div>
   </div>
 </section>
@@ -597,7 +596,6 @@
 <!-- CTA -->
 <div class="cta-section" id="contact" data-section="dark">
   <canvas id="ctaCanvas"></canvas>
-  <span class="chapter-label chapter-label-white">Chapter 09</span>
 
   <div class="cta-inner">
     <p class="sec-eyebrow rv" style="margin-bottom:24px">Get In Touch</p>

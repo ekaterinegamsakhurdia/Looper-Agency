@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="ka">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>რეზიუმეს გაგზავნა · Looper Agency</title>
+<meta name="description" content="Leave your resume with Looper Agency — open roles, internships and an open application.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 28'%3E%3Crect width='44' height='28' fill='%2307080b'/%3E%3Cpath d='M22 14C22 14 17 4 10 4C4.477 4 1 8.477 1 14C1 19.523 4.477 24 10 24C17 24 22 14 22 14ZM22 14C22 14 27 24 34 24C39.523 24 43 19.523 43 14C43 8.477 39.523 4 34 4C27 4 22 14 22 14Z' fill='none' stroke='%230066FF' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Noto+Sans+Georgian:wght@400;500;700;800&display=swap">
+<style>
+:root{--bg:#07080b;--surface:#0d0f14;--surface-2:#141720;--white:#F3F1EC;--text-2:rgba(243,241,236,.68);--text-3:rgba(243,241,236,.55);--line:rgba(255,255,255,.1);--blue:#0066FF;--violet:#7A5CFF;--r-sm:6px;--r-md:14px;--r-pill:999px;--ease:cubic-bezier(.16,1,.3,1);--gutter:clamp(20px,5.5vw,80px);color-scheme:dark;
+--font-d:'Syne','Noto Sans Georgian',system-ui,sans-serif;--font-b:'DM Sans','Noto Sans Georgian',system-ui,sans-serif;--font-m:'DM Mono',ui-monospace,monospace}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;overflow-x:clip}
+body{font-family:var(--font-b);background:var(--bg);color:var(--white);line-height:1.6;overflow-x:clip;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--blue);outline-offset:3px;border-radius:var(--r-sm)}
+::selection{background:var(--blue);color:#fff}
+#prog{position:fixed;top:0;left:0;right:0;height:2px;z-index:50;transform-origin:0 50%;transform:scaleX(0);background:linear-gradient(90deg,var(--blue),var(--violet))}
+nav{position:fixed;top:0;left:0;right:0;z-index:40;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px var(--gutter);background:rgba(7,8,11,.78);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-bottom:1px solid transparent}
+.logo{display:flex;align-items:center;gap:8px;font-family:var(--font-d);font-weight:800;font-size:1.0625rem;letter-spacing:-.02em;text-decoration:none}
+.nav-r{display:flex;align-items:center;gap:20px}
+.back{font-size:.8125rem;font-weight:500;color:var(--text-2);text-decoration:none;transition:color .2s var(--ease)}
+.back:hover{color:var(--white)}
+.btn{display:inline-flex;align-items:center;gap:8px;font:600 .875rem var(--font-b);color:var(--white);background:var(--blue);padding:12px 24px;border-radius:var(--r-pill);text-decoration:none;border:0;cursor:pointer;transition:background .2s var(--ease),transform .3s var(--ease)}
+.btn:hover{background:#0055dd;transform:translateY(-2px)}
+.btn.ghost{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18)}
+.btn.ghost:hover{background:rgba(255,255,255,.14)}
+.btn.sm{padding:9px 18px;font-size:.8125rem}
+/* hero */
+.hero{position:relative;padding:150px var(--gutter) 72px;overflow:hidden;border-bottom:1px solid var(--line)}
+.hero-art{position:absolute;right:-8%;top:50%;width:min(780px,70vw);transform:translateY(-50%);pointer-events:none;opacity:.55}
+.hero-art use{fill:none;stroke:var(--blue);stroke-width:1.4}
+.hero-art .a{stroke-dasharray:5 11;animation:flow 26s linear infinite}
+.hero-art .b{stroke:var(--violet);opacity:.55;transform-origin:200px 150px;animation:spin 60s linear infinite}
+@keyframes flow{to{stroke-dashoffset:-320}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.wrap{max-width:1400px;margin:0 auto;position:relative}
+.crumbs{display:flex;align-items:center;gap:10px;font:500 .75rem var(--font-m);letter-spacing:.12em;text-transform:uppercase;color:var(--text-3);margin-bottom:28px}
+.crumbs a{text-decoration:none;color:var(--text-2)}.crumbs a:hover{color:var(--white)}
+.badges{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:22px}
+.badge{display:inline-flex;align-items:center;gap:8px;font:600 .6875rem var(--font-b);letter-spacing:.14em;text-transform:uppercase;border:1px solid var(--line);background:rgba(255,255,255,.04);padding:7px 14px;border-radius:var(--r-pill);color:var(--text-2)}
+.badge.live{color:var(--white);border-color:rgba(0,102,255,.5)}
+.badge.live::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--blue);box-shadow:0 0 0 0 rgba(0,102,255,.6);animation:pulse 2s infinite}
+@keyframes pulse{70%{box-shadow:0 0 0 9px rgba(0,102,255,0)}100%{box-shadow:0 0 0 0 rgba(0,102,255,0)}}
+h1{font-family:var(--font-d);font-weight:800;letter-spacing:-.04em;line-height:.98;font-size:clamp(2.6rem,7.4vw,6.5rem);max-width:12ch;text-wrap:balance}
+h1 em{font-style:normal;color:var(--blue)}
+.ka-sub{margin-top:14px;font-size:clamp(1rem,1.6vw,1.25rem);color:var(--text-2);font-weight:500}
+.lead{margin-top:28px;max-width:62ch;font-size:clamp(1rem,1.5vw,1.1875rem);color:var(--text-2);line-height:1.75}
+.meta{display:flex;flex-wrap:wrap;gap:12px 28px;margin-top:32px;font-size:.9375rem;color:var(--text-2)}
+.meta span{display:inline-flex;align-items:center;gap:8px}
+.meta svg{color:var(--blue)}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px;margin-top:36px}
+/* body */
+.body{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:64px;padding:80px var(--gutter) 40px;max-width:calc(1400px + 2*var(--gutter));margin:0 auto;align-items:start}
+section.blk{padding:0 0 64px;margin-bottom:64px;border-bottom:1px solid var(--line)}
+section.blk:last-of-type{border-bottom:0;margin-bottom:0}
+.eyebrow{font:600 .6875rem var(--font-b);letter-spacing:.14em;text-transform:uppercase;color:var(--blue);margin-bottom:14px;display:flex;gap:10px;align-items:center}
+.eyebrow::before{content:'\221E';color:var(--blue);font-size:1.1em;letter-spacing:0}
+h2{font-family:var(--font-d);font-weight:800;letter-spacing:-.03em;line-height:1.1;font-size:clamp(1.6rem,3.2vw,2.5rem);margin-bottom:22px;text-wrap:balance}
+p.t{color:var(--text-2);font-size:1.0625rem;line-height:1.8;max-width:68ch}
+p.t+p.t{margin-top:16px}
+ol.duties{list-style:none;counter-reset:d;display:grid;gap:12px;margin-top:26px}
+ol.duties li{counter-increment:d;display:grid;grid-template-columns:44px 1fr;gap:18px;align-items:start;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:20px 24px;color:var(--text-2);line-height:1.7;transition:border-color .3s var(--ease),transform .4s var(--ease),background .3s}
+ol.duties li::before{content:counter(d,decimal-leading-zero);font:500 .8125rem var(--font-m);color:var(--blue);padding-top:3px}
+ol.duties li:hover{border-color:rgba(0,102,255,.55);transform:translateX(6px);background:var(--surface-2)}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:30px}
+.panel h3{font-family:var(--font-d);font-weight:800;letter-spacing:-.02em;font-size:1.25rem;margin-bottom:18px}
+ul.chk{list-style:none;display:grid;gap:14px}
+ul.chk li{position:relative;padding-left:30px;color:var(--text-2);line-height:1.65}
+ul.chk li::before{content:'';position:absolute;left:0;top:.45em;width:16px;height:16px;border-radius:50%;border:1.5px solid var(--blue);background:radial-gradient(circle,var(--blue) 0 3px,transparent 4px)}
+ul.chk.plus li::before{border-color:var(--violet);background:none;content:'+';display:grid;place-items:center;font:600 .8rem var(--font-b);color:var(--violet);line-height:1}
+.offer{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-top:26px;list-style:none}
+.offer li{background:linear-gradient(160deg,var(--surface),var(--surface-2));border:1px solid var(--line);border-radius:var(--r-md);padding:20px 22px;color:var(--text-2);line-height:1.6;font-size:.9688rem;transition:transform .4s var(--ease),border-color .3s}
+.offer li:hover{transform:translateY(-4px);border-color:rgba(122,92,255,.5)}
+.process{background:linear-gradient(135deg,rgba(0,102,255,.14),rgba(122,92,255,.12));border:1px solid rgba(0,102,255,.3);border-radius:var(--r-md);padding:clamp(24px,4vw,44px)}
+.subject{margin-top:26px;display:flex;flex-wrap:wrap;align-items:center;gap:12px 16px;background:rgba(7,8,11,.55);border:1px solid var(--line);border-radius:var(--r-md);padding:16px 18px}
+.subject small{display:block;font:600 .6875rem var(--font-b);letter-spacing:.14em;text-transform:uppercase;color:var(--text-3);width:100%}
+.subject code{font:500 .9375rem var(--font-m);color:var(--white);flex:1 1 220px;overflow-wrap:anywhere}
+.copy{font:600 .75rem var(--font-b);letter-spacing:.06em;color:var(--white);background:rgba(255,255,255,.08);border:1px solid var(--line);border-radius:var(--r-pill);padding:8px 16px;cursor:pointer;transition:background .2s,border-color .2s}
+.copy:hover{background:rgba(255,255,255,.14);border-color:var(--blue)}
+.mailline{margin-top:18px;color:var(--text-2);font-size:.9375rem}
+.mailline b{color:var(--white);font-weight:600;user-select:all}
+/* side */
+aside{position:sticky;top:88px;display:grid;gap:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:26px}
+.card h4{font:600 .6875rem var(--font-b);letter-spacing:.14em;text-transform:uppercase;color:var(--text-3);margin-bottom:16px}
+.kv{display:grid;gap:14px}
+.kv div{display:flex;justify-content:space-between;gap:12px;font-size:.9375rem;border-bottom:1px solid var(--line);padding-bottom:12px}
+.kv div:last-child{border-bottom:0;padding-bottom:0}
+.kv span{color:var(--text-3)}.kv b{font-weight:600;text-align:right}
+.card .btn{width:100%;justify-content:center;margin-top:18px}
+.others a{display:flex;justify-content:space-between;align-items:center;gap:12px;text-decoration:none;padding:12px 0;border-bottom:1px solid var(--line);color:var(--text-2);transition:color .2s,padding .3s var(--ease)}
+.others a:last-child{border-bottom:0}
+.others a:hover{color:var(--white);padding-left:6px}
+.others small{display:block;color:var(--text-3);font-size:.75rem}
+footer{border-top:1px solid var(--line);padding:40px var(--gutter);display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;color:var(--text-3);font-size:.8125rem}
+footer a{color:var(--text-2);text-decoration:none}footer a:hover{color:var(--white)}
+.rv{opacity:0;transform:translateY(22px);transition:opacity .55s var(--ease),transform .65s var(--ease)}
+.rv.on{opacity:1;transform:none}
+@media(max-width:1000px){.body{grid-template-columns:1fr;gap:32px}aside{position:static}.cols{grid-template-columns:1fr}.hero-art{opacity:.25}}
+@media(max-width:560px){nav .back{display:none}ol.duties li{grid-template-columns:34px 1fr;padding:16px 18px;gap:12px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}html{scroll-behavior:auto}}
+
+.hero.r{padding-bottom:84px}
+.hero.r h1{max-width:16ch;font-size:clamp(2.2rem,5.6vw,5rem);line-height:1.08}
+.hero.r .lead{max-width:60ch}
+.sec{padding:96px var(--gutter) 0;max-width:calc(1400px + 2*var(--gutter));margin:0 auto}
+.sec-h{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:12px 32px;margin-bottom:34px}
+.sec-h h2{margin-bottom:0}
+.roles{display:grid;gap:14px}
+.role-grp{font:600 .6875rem var(--font-b);letter-spacing:.14em;text-transform:uppercase;color:var(--text-3);margin:34px 0 6px}
+.role-grp:first-of-type{margin-top:0}
+.role{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px 28px;align-items:center;text-decoration:none;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:24px 28px;transition:border-color .3s var(--ease),transform .4s var(--ease),background .3s}
+.role:hover{border-color:rgba(0,102,255,.55);transform:translateX(6px);background:var(--surface-2)}
+.role .n{font:500 .8125rem var(--font-m);color:var(--blue)}
+.role h3{font-family:var(--font-d);font-weight:800;letter-spacing:-.02em;font-size:clamp(1.15rem,2vw,1.5rem);line-height:1.2}
+.role p{color:var(--text-3);font-size:.9375rem;margin-top:4px}
+.role .go{font:600 .8125rem var(--font-b);color:var(--white);display:inline-flex;gap:8px;align-items:center;white-space:nowrap}
+.role .go b{font-weight:400;transition:transform .3s var(--ease)}
+.role:hover .go b{transform:translateX(5px)}
+.perks{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;list-style:none}
+.perks li{background:linear-gradient(160deg,var(--surface),var(--surface-2));border:1px solid var(--line);border-radius:var(--r-md);padding:26px 24px;color:var(--text-2);line-height:1.6;transition:transform .4s var(--ease),border-color .3s}
+.perks li:hover{transform:translateY(-4px);border-color:rgba(122,92,255,.5)}
+.perks li::before{content:'\221E';display:block;color:var(--blue);font-size:1.5rem;line-height:1;margin-bottom:14px}
+.apply{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:clamp(28px,5vw,72px);align-items:start;background:linear-gradient(135deg,rgba(0,102,255,.14),rgba(122,92,255,.12));border:1px solid rgba(0,102,255,.3);border-radius:var(--r-md);padding:clamp(26px,4.5vw,56px)}
+.apply .t{margin-top:0}
+.apply .mailline{margin-top:22px}
+form.rf{display:grid;gap:16px;background:rgba(7,8,11,.6);border:1px solid var(--line);border-radius:var(--r-md);padding:clamp(20px,3vw,32px)}
+.rf label{display:grid;gap:7px;font:600 .8125rem var(--font-b);color:var(--text-2)}
+.rf input[type=text],.rf input[type=email]{font:400 1rem var(--font-b);color:var(--white);background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:var(--r-sm);padding:13px 14px;width:100%;transition:border-color .2s,background .2s}
+.rf input:focus{outline:none;border-color:var(--blue);background:rgba(255,255,255,.08)}
+.drop{position:relative;display:grid;place-items:center;text-align:center;gap:6px;min-height:118px;border:1.5px dashed rgba(255,255,255,.22);border-radius:var(--r-md);padding:18px;color:var(--text-2);font-weight:500;cursor:pointer;transition:border-color .2s,background .2s}
+.drop:hover,.drop.over{border-color:var(--blue);background:rgba(0,102,255,.08)}
+.drop input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
+.drop small{color:var(--text-3);font-weight:400}
+.drop.has{border-style:solid;border-color:rgba(0,102,255,.6);color:var(--white)}
+.rf .msg{min-height:1.4em;font-size:.9375rem}
+.rf .msg.err{color:#ff8a8a}
+.rf .msg.ok{color:#7ee0a8}
+.rf .btn{justify-content:center;width:100%}
+.rf .btn[disabled]{opacity:.6;cursor:wait;transform:none}
+.thanks{display:none;text-align:center;padding:28px 8px}
+.thanks h3{font-family:var(--font-d);font-weight:800;font-size:1.6rem;margin-bottom:10px}
+.thanks p{color:var(--text-2)}
+.rf.done>*:not(.thanks){display:none}.rf.done .thanks{display:block}
+.fallback{display:none;margin-top:4px;padding:14px 16px;border:1px solid var(--line);border-radius:var(--r-sm);color:var(--text-2);font-size:.9375rem;background:rgba(255,255,255,.04)}
+.fallback b{color:var(--white);user-select:all}
+.rbody{padding-bottom:96px}
+@media(max-width:900px){.apply{grid-template-columns:1fr}}
+@media(max-width:560px){.role{grid-template-columns:auto minmax(0,1fr);padding:20px}.role .go{grid-column:2}.sec{padding-top:72px}}
+</style>
+</head>
+<body>
+<div id="prog" aria-hidden="true"></div>
+<nav>
+  <a class="logo" href="../index.html" aria-label="Looper Agency — home"><svg width="22" height="14" viewBox="0 0 44 28" fill="none"><path d="M22 14C22 14 17 4 10 4C4.477 4 1 8.477 1 14C1 19.523 4.477 24 10 24C17 24 22 14 22 14ZM22 14C22 14 27 24 34 24C39.523 24 43 19.523 43 14C43 8.477 39.523 4 34 4C27 4 22 14 22 14Z" stroke="#0066FF" stroke-width="2.5" stroke-linecap="round"/></svg>LOOPER</a>
+  <div class="nav-r"><a class="back" href="../index.html#careers">← All careers</a><a class="btn sm" href="#apply">რეზიუმეს გაგზავნა</a></div>
+</nav>
+
+<header class="hero r">
+  <svg class="hero-art" viewBox="0 0 400 300" aria-hidden="true"><defs><path id="lp" d="M370.0 150.0 L368.1 162.9 L362.5 174.9 L353.9 185.1 L343.0 193.2 L330.7 198.7 L317.8 202.0 L304.8 203.0 L292.2 202.3 L280.1 200.0 L268.9 196.5 L258.4 192.2 L248.6 187.1 L239.4 181.5 L230.9 175.6 L222.8 169.4 L215.0 163.0 L207.4 156.5 L200.0 150.0 L192.6 143.5 L185.0 137.0 L177.2 130.6 L169.1 124.4 L160.6 118.5 L151.4 112.9 L141.6 107.8 L131.1 103.5 L119.9 100.0 L107.8 97.7 L95.2 97.0 L82.2 98.0 L69.3 101.3 L57.0 106.8 L46.1 114.9 L37.5 125.1 L31.9 137.1 L30.0 150.0 L31.9 162.9 L37.5 174.9 L46.1 185.1 L57.0 193.2 L69.3 198.7 L82.2 202.0 L95.2 203.0 L107.8 202.3 L119.9 200.0 L131.1 196.5 L141.6 192.2 L151.4 187.1 L160.6 181.5 L169.1 175.6 L177.2 169.4 L185.0 163.0 L192.6 156.5 L200.0 150.0 L207.4 143.5 L215.0 137.0 L222.8 130.6 L230.9 124.4 L239.4 118.5 L248.6 112.9 L258.4 107.8 L268.9 103.5 L280.1 100.0 L292.2 97.7 L304.8 97.0 L317.8 98.0 L330.7 101.3 L343.0 106.8 L353.9 114.9 L362.5 125.1 L368.1 137.1 L370.0 150.0Z"/></defs><use href="#lp" class="a"/><use href="#lp" class="b" transform="scale(.8) translate(50 37.5)"/></svg>
+  <div class="wrap">
+    <p class="crumbs"><a href="../index.html">Looper</a><span>/</span><a href="../index.html#careers">Careers</a><span>/</span><span>რეზიუმე</span></p>
+    <div class="badges"><span class="badge live">ღია პოზიციები • ვაკანსიები და სტაჟირებები</span></div>
+    <h1>შემოგვიერთდი Looper Agency <em>გუნდში</em></h1>
+    <p class="lead">Looper Agency კრეატიული გუნდია — ვქმნით კონტენტს, რომელიც ბრენდს ხილულს ხდის. აირჩიე ღია პოზიცია ან გამოგვიგზავნე რეზიუმე: შესაბამისი პოზიციის გახსნისას დაგიკავშირდებით.</p>
+    <div class="meta"><span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>თბილისი, საქართველო</span><span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>სრული და ნახევარი განაკვეთი</span></div>
+    <div class="cta-row"><a class="btn" href="#apply">რეზიუმეს გაგზავნა →</a><a class="btn ghost" href="#roles">პოზიციების ნახვა</a></div>
+  </div>
+</header>
+
+<main class="rbody">
+  <section class="sec" id="roles">
+    <div class="sec-h rv"><div><p class="eyebrow">ვაკანსიები</p><h2>ღია ვაკანსიები</h2></div></div>
+    <div class="roles"><p class="role-grp">ვაკანსიები</p><a class="role rv" href="advertiser.html"><span class="n">01</span><span><h3>Advertising Specialist</h3><p>ვაკანსია • Full-time • Tbilisi, Georgia · Remote-friendly</p></span><span class="go">დეტალურად <b aria-hidden="true">→</b></span></a><p class="role-grp">სტაჟირებები</p><a class="role rv" href="account-manager-internship.html"><span class="n">02</span><span><h3>ექაუნთ მენეჯმენტის სტაჟირება</h3><p>სტაჟირება • Full-time • Tbilisi, Georgia · Hybrid</p></span><span class="go">დეტალურად <b aria-hidden="true">→</b></span></a><a class="role rv" href="video-content-production-internship.html"><span class="n">03</span><span><h3>Video Production სტაჟირება</h3><p>სტაჟირება • Full-time • Tbilisi, Georgia · Hybrid</p></span><span class="go">დეტალურად <b aria-hidden="true">→</b></span></a></div>
+  </section>
+
+  <section class="sec" id="perks">
+    <div class="sec-h rv"><div><p class="eyebrow">რას გთავაზობთ</p><h2>რას მიიღებ ჩვენთან</h2></div></div>
+    <ul class="perks"><li class="rv">რეალური პროექტები ცნობილ ბრენდებთან</li><li class="rv">მენტორობა და პროფესიული ზრდა</li><li class="rv">მოქნილი სამუშაო გრაფიკი</li><li class="rv">მეგობრული და კრეატიული გუნდი</li></ul>
+  </section>
+
+  <section class="sec" id="apply">
+    <div class="apply rv">
+      <div>
+        <p class="eyebrow">ღია განაცხადი</p>
+        <h2>ვერ იპოვე შენთვის სასურველი პოზიცია?</h2>
+        <p class="t">დაგვიტოვე რეზიუმე (PDF ან Word) — თუ შესაბამისი პოზიცია გაიხსნება, დაგიკავშირდებით.</p>
+        <p class="mailline">რეზიუმე პირდაპირ ელ-ფოსტაზეც შეგიძლია გამოგვიგზავნო: <b>info@looperagency.ge</b></p>
+        <div class="cta-row"><a class="btn ghost" href="mailto:info@looperagency.ge?subject=Resume">info@looperagency.ge</a><button class="copy" type="button" id="copyMail">Copy email</button></div>
+      </div>
+      <form class="rf" id="rf" novalidate>
+        <label>სახელი და გვარი<input type="text" name="name" maxlength="100" autocomplete="name" required></label>
+        <label>ელ-ფოსტა<input type="email" name="email" maxlength="255" autocomplete="email" required></label>
+        <label>რომელი პოზიცია გაინტერესებს? (არასავალდებულო)<input type="text" name="role" maxlength="200" list="roleList"><datalist id="roleList"><option value="Advertising Specialist"><option value="ექაუნთ მენეჯმენტის სტაჟირება"><option value="Video Production სტაჟირება"></datalist></label>
+        <label>რეზიუმე (PDF ან Word, მაქს. 10 MB)
+          <span class="drop" id="drop"><span id="dropTxt">აირჩიე ფაილი ან ჩააგდე აქ</span><small>.pdf · .doc · .docx</small><input type="file" id="file" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"></span>
+        </label>
+        <p class="msg" id="msg" role="status" aria-live="polite"></p>
+        <div class="fallback" id="fb">ფორმის გაგზავნა ამ გვერდიდან ვერ მოხერხდა — გთხოვთ, რეზიუმე გამოგვიგზავნოთ ელ-ფოსტაზე: <b>info@looperagency.ge</b></div>
+        <button class="btn" type="submit" id="send">რეზიუმეს გაგზავნა</button>
+        <div class="thanks" id="thanks"><h3>გმადლობთ!</h3><p>თქვენი რეზიუმე მივიღეთ. შესაბამისი პოზიციის გახსნისას დაგიკავშირდებით.</p></div>
+      </form>
+    </div>
+  </section>
+</main>
+<footer><span>© 2026 Looper Agency</span><span><a href="../index.html#careers">All careers</a> · <a href="../index.html">Home</a></span></footer>
+<script>
+(function(){
+  var SB={url:"https://tmprcexuikwzrzhnzany.supabase.co",key:"sb_publishable_K8r9GEFBoWkKEiazLRYSKA_kI0sSX7F"};
+  var MAX=10*1024*1024,OK=/\.(pdf|docx?)$/i,TYPES=['application/pdf','application/msword','application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+  var io=new IntersectionObserver(function(es){es.forEach(function(x){if(x.isIntersecting){x.target.classList.add('on');io.unobserve(x.target)}})},{threshold:.08});
+  document.querySelectorAll('.rv').forEach(function(el){io.observe(el)});
+  var bar=document.getElementById('prog');
+  function p(){var m=document.documentElement.scrollHeight-innerHeight;bar.style.transform='scaleX('+(m>0?Math.min(1,scrollY/m):0)+')'}
+  addEventListener('scroll',p,{passive:true});p();
+  var cm=document.getElementById('copyMail');
+  cm.addEventListener('click',function(){
+    function done(){cm.textContent='Copied ✓';setTimeout(function(){cm.textContent='Copy email'},1800)}
+    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText('info@looperagency.ge').then(done,function(){});
+  });
+  var f=document.getElementById('rf'),file=document.getElementById('file'),drop=document.getElementById('drop'),dt=document.getElementById('dropTxt'),msg=document.getElementById('msg'),fb=document.getElementById('fb'),send=document.getElementById('send');
+  var chosen=null;
+  function say(t,c){msg.textContent=t||'';msg.className='msg'+(c?' '+c:'')}
+  function pick(fl){
+    say('');chosen=null;drop.classList.remove('has');dt.textContent='აირჩიე ფაილი ან ჩააგდე აქ';
+    if(!fl)return;
+    if(!(OK.test(fl.name)||TYPES.indexOf(fl.type)>-1)){say('გთხოვთ, ატვირთოთ PDF ან Word დოკუმენტი (.pdf, .doc, .docx).','err');file.value='';return}
+    if(fl.size>MAX){say('ფაილი ძალიან დიდია — გთხოვთ, ზომა 10 MB-ს არ აღემატებოდეს.','err');file.value='';return}
+    chosen=fl;drop.classList.add('has');dt.textContent=fl.name;
+  }
+  file.addEventListener('change',function(){pick(file.files&&file.files[0])});
+  ['dragenter','dragover'].forEach(function(t){drop.addEventListener(t,function(e){e.preventDefault();drop.classList.add('over')})});
+  ['dragleave','drop'].forEach(function(t){drop.addEventListener(t,function(e){e.preventDefault();drop.classList.remove('over')})});
+  drop.addEventListener('drop',function(e){var fl=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0];if(fl){try{var d=new DataTransfer();d.items.add(fl);file.files=d.files}catch(_){}pick(fl)}});
+  f.addEventListener('submit',function(ev){
+    ev.preventDefault();fb.style.display='none';
+    var name=f.name.value.trim().slice(0,100),email=f.email.value.trim().slice(0,255),role=f.role.value.trim().slice(0,200);
+    if(!name||!/^\S+@\S+\.\S+$/.test(email)){say('გთხოვთ, მიუთითოთ სახელი და ელ-ფოსტის სწორი მისამართი.','err');return}
+    if(!chosen){say('გთხოვთ, ატვირთოთ რეზიუმე PDF ან Word ფორმატში.','err');return}
+    if(!SB){fb.style.display='block';say('');return}
+    send.disabled=true;send.textContent='იგზავნება…';say('');
+    var id=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():String(Date.now())+Math.random().toString(16).slice(2);
+    var path=id+'/'+chosen.name.replace(/[^\w.\-]+/g,'_');
+    var H={apikey:SB.key};
+    fetch(SB.url+'/storage/v1/object/resumes/'+path,{method:'POST',headers:{apikey:SB.key,'Content-Type':chosen.type||'application/octet-stream','x-upsert':'false'},body:chosen})
+    .then(function(r){if(!r.ok)throw new Error('upload');return fetch(SB.url+'/rest/v1/applications',{method:'POST',headers:{apikey:SB.key,'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify({name:name,email:email,role:role||null,resume_path:path})})})
+    .then(function(r){if(!r.ok)throw new Error('insert');f.classList.add('done');document.getElementById('thanks').scrollIntoView({block:'center'})})
+    .catch(function(){send.disabled=false;send.textContent='რეზიუმეს გაგზავნა';say('გაგზავნისას მოხდა შეცდომა. სცადეთ ხელახლა ან გამოგვიგზავნეთ ელ-ფოსტაზე.','err');fb.style.display='block'});
+  });
+})();
+</script>
+</body>
+</html>

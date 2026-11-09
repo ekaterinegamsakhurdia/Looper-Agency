@@ -216,6 +216,8 @@ partners.forEach((p,i)=>{ const src = (LOOPER_CFG.heroCards||[])[i]; if(src) p.p
 /* ═══════════════════════════════════════════════════════════
    NAV EXTRAS: mobile menu, scroll-spy, scroll progress
 ═══════════════════════════════════════════════════════════ */
+
+
 (function(){
   const nav=document.getElementById('mainNav'), toggle=document.getElementById('navToggle'), sheet=document.getElementById('navSheet');
   const root=document.documentElement;
@@ -380,8 +382,7 @@ partners.forEach((p,i)=>{ const src = (LOOPER_CFG.heroCards||[])[i]; if(src) p.p
   const N = partners.length;                     // 10
   const hero = document.getElementById('home');
   const ring = document.createElement('div');
-  ring.className = 'orbit-ring';
-  layer.appendChild(ring);
+  ring.className = 'orbit-ring';   // kept only as a (now empty) anchor — see the note in frame()
   const lerp=(a,b,t)=>a+(b-a)*t, clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
   const ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
   function hueFromX(nx){ return nx<.5 ? lerp(212,240,nx*2) : lerp(240,272,(nx-.5)*2); }  // same mapping as Chapter 03
@@ -426,7 +427,7 @@ partners.forEach((p,i)=>{ const src = (LOOPER_CFG.heroCards||[])[i]; if(src) p.p
 
     inner.appendChild(front); inner.appendChild(back);
     wrap.appendChild(inner);
-    ring.appendChild(wrap);
+    layer.appendChild(wrap);          // cards are direct children of the perspective layer (flat stacking, never 3D-intersecting)
     wrap._inner=inner; wrap._front=front; wrap._back=back; wrap._img=img; wrap._gloss=gloss;
     wrap._fShade=fShade; wrap._bShade=bShade; wrap._hint={style:{}};
     return wrap;
@@ -512,8 +513,11 @@ partners.forEach((p,i)=>{ const src = (LOOPER_CFG.heroCards||[])[i]; if(src) p.p
     accent = lerp(accent, hueFromX(mIn?mNX:.5), clamp(dt*3,0,1));
 
     const tilt = lerp(-13, 0, ce) + par.y*-8;
-    ring.style.transform =
-      `translateY(${(-ce*115).toFixed(1)}px) rotateX(${(tilt).toFixed(2)}deg) rotateY(${(par.x*14).toFixed(2)}deg) scale(${(1-ce*0.22).toFixed(3)})`;
+    /* The ring's own transform is baked into every card's transform instead of living on a parent with
+       preserve-3d. That way the browser stacks the cards like flat sheets of paper (by the z-index set below)
+       and a card that covers another one covers it completely — no more corners poking through. */
+    const ringT = `translateY(${(-ce*115).toFixed(1)}px) rotateX(${(tilt).toFixed(2)}deg) rotateY(${(par.x*14).toFixed(2)}deg) scale(${(1-ce*0.22).toFixed(3)})`;
+    const cT=Math.cos(tilt*Math.PI/180), sT=Math.sin(tilt*Math.PI/180), cP=Math.cos(par.x*14*Math.PI/180), sP=Math.sin(par.x*14*Math.PI/180);
     layer.style.opacity = (1 - clamp((collect-0.8)/0.2,0,1)).toFixed(3);
 
     for(let i=0;i<N;i++){
@@ -526,7 +530,7 @@ partners.forEach((p,i)=>{ const src = (LOOPER_CFG.heroCards||[])[i]; if(src) p.p
       const Reff = lerp(R*c.rad, -k*16, cei);
       const y = lerp(c.yOff*CH*0.16, -k*7, cei);
       const x = 0;
-      el.style.transform =
+      el.style.transform = ringT + ' ' +
         `rotateY(${aEff.toFixed(2)}deg) translate3d(${x.toFixed(1)}px,${y.toFixed(1)}px,${Reff.toFixed(1)}px) rotateZ(${(c.roll*(1-cei)).toFixed(2)}deg) rotateX(${(c.pitch*(1-cei)).toFixed(2)}deg)`;
 
       // far side slightly dimmer (depth cue); near side fully lit
@@ -554,7 +558,10 @@ partners.forEach((p,i)=>{ const src = (LOOPER_CFG.heroCards||[])[i]; if(src) p.p
       } else if(el._wasHover){
         el._inner.style.transform=''; el._front.style.boxShadow=''; el._gloss.style.opacity=0; el._wasHover=false;
       }
-      el.style.zIndex = i===hovered ? 5 : 1;
+      /* depth of the card centre after the ring transform → nearer cards get a higher z-index */
+      const aR=aEff*Math.PI/180, px=Reff*Math.sin(aR), pz=Reff*Math.cos(aR);
+      const z1=-px*sP+pz*cP, z2=y*sT+z1*cT;
+      el.style.zIndex = i===hovered ? 9000 : Math.round(z2+3000);
     }
     requestAnimationFrame(frame);
   }
@@ -683,17 +690,6 @@ partners.forEach((p,i)=>{ const src = (LOOPER_CFG.heroCards||[])[i]; if(src) p.p
   }
   window.addEventListener('scroll',checkLines,{passive:true});
   checkLines();
-})();
-
-/* Chapter corners — each label shows while its own section is on screen */
-(function(){
-  const ioC=new IntersectionObserver(entries=>{
-    entries.forEach(e=>{ e.target.querySelectorAll('.chapter-label,.chapter-label-left').forEach(el=>el.classList.toggle('vis',e.isIntersecting)); });
-  },{threshold:0.15});
-  document.querySelectorAll('.chapter-label').forEach(l=>{
-    const host=l.closest('.photo-section,.partners-section,.brand-section,.team-section,.careers-section,.cta-section,.statement-section,.services-section,.work-wrap')||l.parentElement;
-    if(host && !host._chapObs){ host._chapObs=1; ioC.observe(host); }
-  });
 })();
 
 /* Stats band reveal */
@@ -1211,6 +1207,31 @@ function makeCardBuffer(p,w,h){
   const oc=document.createElement('canvas');oc.width=w;oc.height=h;
   const ctx=oc.getContext('2d');
   const hue=BV(p.hue),sat=p.sat;
+  if(window.LOOPER_THEME&&window.LOOPER_THEME.light){
+    /* light "poster" card: pale top → vivid blue glow at the bottom, orange glass blobs, navy wave lines */
+    const g=ctx.createLinearGradient(0,0,0,h);
+    g.addColorStop(0,'#F8F8FB');g.addColorStop(.52,'#E8ECF7');g.addColorStop(1,`hsl(${hue},100%,54%)`);
+    ctx.fillStyle=g;ctx.fillRect(0,0,w,h);
+    const idxL=PROJECTS.indexOf(p)+1;
+    for(let i=0;i<3;i++){
+      const bx=w*(0.22+((i*0.31+idxL*0.13)%0.6)),by=h*(0.16+i*0.17);
+      const rg=ctx.createRadialGradient(bx,by,0,bx,by,w*0.3);
+      rg.addColorStop(0,'rgba(255,122,69,0.34)');rg.addColorStop(1,'rgba(255,122,69,0)');
+      ctx.fillStyle=rg;ctx.fillRect(0,0,w,h);
+    }
+    for(let j=0;j<5;j++){
+      ctx.beginPath();
+      for(let x=0;x<=w;x+=2){
+        const y=h*0.46+Math.sin((x*0.025)+(j*1.1)+(idxL*1.7))*(30+j*18)*Math.sin(x/w*Math.PI);
+        x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+      }
+      ctx.strokeStyle=`rgba(11,33,96,${0.06+j*0.012})`;ctx.lineWidth=1.5;ctx.stroke();
+    }
+    ctx.beginPath();
+    for(let x=0;x<=w;x+=2){const y=h*0.46+Math.sin((x*0.018)+idxL)*18;x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}
+    ctx.strokeStyle='rgba(242,99,43,0.75)';ctx.lineWidth=2.5;ctx.stroke();
+    return oc;
+  }
   const g=ctx.createLinearGradient(0,0,w,h);
   g.addColorStop(0,`hsl(${hue},${sat}%,8%)`);
   g.addColorStop(.45,`hsl(${hue+8},${sat+5}%,14%)`);
@@ -1248,13 +1269,15 @@ function makeCardBuffer(p,w,h){
 const canvas=document.getElementById('workCanvas');
 if(!canvas)return;
 const ctx=canvas.getContext('2d');
-let W,H;
+let W,H,PHONE=false;
 let cardBufs=[],cardTintR=[],cardTintB=[];
 
 function resize(){
   W=canvas.width=canvas.offsetWidth||window.innerWidth;
   H=canvas.height=canvas.offsetHeight||600;
-  const cw=Math.round(W*0.18);
+  PHONE=W<=768;
+  /* phones: ~55% of the screen width so each card is actually readable; desktop keeps the wide arc */
+  const cw=PHONE?Math.round(Math.min(W*0.56,H*0.27)):Math.round(W*0.18);
   const ch=Math.round(cw*1.4);
   cardBufs=PROJECTS.map(p=>makeCardBuffer(p,cw,ch));
   // red-only / blue-only copies used for the RGB split on hover
@@ -1286,7 +1309,10 @@ function hueToRgb(h,s,l){
   const f=n=>l-a*Math.max(-1,Math.min(k(n)-3,Math.min(9-k(n),1)));
   return[Math.round(f(0)*255),Math.round(f(8)*255),Math.round(f(4)*255)];
 }
-function accentRGB(h){return hueToRgb(h,90,60);}
+function accentRGB(h){
+  if(window.LOOPER_THEME&&window.LOOPER_THEME.light) return hueToRgb(14+clamp((h-212)/60,0,1)*14,100,56);   // light mode: neon edges/glows are orange
+  return hueToRgb(h,90,60);
+}
 function accentCSS(h,a=1){const[r,g,b]=accentRGB(h);return `rgba(${r},${g},${b},${a})`;}
 
 /* ── Card outline with optional liquid bulge on the left / right edge ── */
@@ -1340,7 +1366,7 @@ function drawCard(ctx,buf,cx,cy,scale,alpha,isCenter,accentHue,mouseNX,mouseNY,e
     const vg=ctx.createRadialGradient(cx,cy,0,cx,cy,Math.max(cw,ch)*0.65);
     vg.addColorStop(0,'rgba(0,0,0,0)');
     vg.addColorStop(1,'rgba(0,0,0,0.35)');
-    ctx.fillStyle=vg;ctx.fillRect(x,y,cw,ch);
+    if(!(window.LOOPER_THEME&&window.LOOPER_THEME.light)){ctx.fillStyle=vg;ctx.fillRect(x,y,cw,ch);}
   } else {
     // Pixel-block glitch — mosaic pass
     const dist=Math.abs(scale-1)/0.6; // 0 at center, 1 at far edge
@@ -1356,12 +1382,12 @@ function drawCard(ctx,buf,cx,cy,scale,alpha,isCenter,accentHue,mouseNX,mouseNY,e
 
     // scanline overlay
     const lineAlpha=clamp(dist*0.45,0,0.4);
-    for(let ly=y;ly<y+ch;ly+=Math.max(2,Math.round(3*scale))){
+    if(!(window.LOOPER_THEME&&window.LOOPER_THEME.light))for(let ly=y;ly<y+ch;ly+=Math.max(2,Math.round(3*scale))){
       ctx.fillStyle=`rgba(0,0,0,${lineAlpha})`;
       ctx.fillRect(x,ly,cw,Math.max(1,Math.round(scale)));
     }
     // dark overlay so non-center recedes
-    ctx.fillStyle=`rgba(0,0,0,${clamp(dist*0.5,0,0.5)})`;
+    ctx.fillStyle=(window.LOOPER_THEME&&window.LOOPER_THEME.light)?`rgba(${window.LOOPER_THEME.stageRGB},${clamp(dist*0.4,0,0.4)})`:`rgba(0,0,0,${clamp(dist*0.5,0,0.5)})`;
     ctx.fillRect(x,y,cw,ch);
   }
 
@@ -1379,11 +1405,13 @@ function drawCard(ctx,buf,cx,cy,scale,alpha,isCenter,accentHue,mouseNX,mouseNY,e
     }
     // RGB split (red one way, blue the other) — stronger with speed
     const ca=(1.5+fx.vel*7)*hv*scale+(gl.on?3:0);
-    ctx.globalCompositeOperation='lighter';
-    ctx.globalAlpha=alpha*0.3*hv;
-    ctx.drawImage(fx.tR,x-ca,y,cw,ch);
-    ctx.drawImage(fx.tB,x+ca,y,cw,ch);
-    ctx.globalCompositeOperation='source-over';
+    if(!(window.LOOPER_THEME&&window.LOOPER_THEME.light)){     // additive fringe only works on a dark stage
+      ctx.globalCompositeOperation='lighter';
+      ctx.globalAlpha=alpha*0.3*hv;
+      ctx.drawImage(fx.tR,x-ca,y,cw,ch);
+      ctx.drawImage(fx.tB,x+ca,y,cw,ch);
+      ctx.globalCompositeOperation='source-over';
+    }
     // light sweep under the cursor
     const lg=ctx.createRadialGradient(fx.mx,fx.my,0,fx.mx,fx.my,cw*0.6);
     lg.addColorStop(0,accentCSS(accentHue,0.22*hv));
@@ -1411,7 +1439,7 @@ function drawCard(ctx,buf,cx,cy,scale,alpha,isCenter,accentHue,mouseNX,mouseNY,e
   ctx.restore();
 
   // ── Floor reflection ──
-  if(isCenter||scale>0.4){
+  if((isCenter||scale>0.4)&&!(window.LOOPER_THEME&&window.LOOPER_THEME.light)){     // mirror floor only reads on the dark stage
     const ry=cy+ch/2*scale;
     const rh=Math.round(ch*scale*0.35);
     ctx.save();
@@ -1424,7 +1452,7 @@ function drawCard(ctx,buf,cx,cy,scale,alpha,isCenter,accentHue,mouseNX,mouseNY,e
     ctx.imageSmoothingEnabled=false;
     ctx.drawImage(buf,-cw/2,-rh,cw,rh);
     const fg=ctx.createLinearGradient(0,0,0,-rh);
-    fg.addColorStop(0,'rgba(0,0,0,0)');fg.addColorStop(1,'rgba(0,0,0,0.9)');
+    {const sr=(window.LOOPER_THEME||{}).stageRGB||'0,0,0';fg.addColorStop(0,`rgba(${sr},0)`);fg.addColorStop(1,`rgba(${sr},0.9)`);}
     ctx.fillStyle=fg;ctx.fillRect(-cw/2,0-rh,cw,rh);
     ctx.restore();
   }
@@ -1462,7 +1490,7 @@ function updateInfo(i){
   const p=PROJECTS[i];
   const cur=document.getElementById('wtCur');
   if(cur)cur.textContent=p.num;
-  const [r,g,b]=hueToRgb(p.hue,90,60);
+  const [r,g,b]=(window.LOOPER_THEME&&window.LOOPER_THEME.light)?hueToRgb(14+(p.hue%60)/60*14,100,55):hueToRgb(p.hue,90,60);
   const sec=document.getElementById('work');
   if(sec){
     sec.style.setProperty('--wAccent',`rgb(${r},${g},${b})`);
@@ -1538,7 +1566,8 @@ function render(ts){
 
   // background
   ctx.clearRect(0,0,W,H);
-  ctx.fillStyle='#06040e';
+  const TH=window.LOOPER_THEME||{light:false,stage:'#06040e',stageRGB:'6,4,14'};
+  ctx.fillStyle=TH.stage;
   ctx.fillRect(0,0,W,H);
 
   // subtle bg radial glow driven by mouse
@@ -1549,7 +1578,8 @@ function render(ts){
 
   // ── cursor light: a soft blob plus a fading smoky trail (drawn behind the cards) ──
   ctx.save();
-  ctx.globalCompositeOperation='lighter';
+  ctx.globalCompositeOperation=TH.light?'multiply':'lighter';   // additive light on dark, ink-like tint on cream
+  const LB=TH.light?1.7:1;
   for(let k=trail.length-1;k>=0;k--){
     const p=trail[k];
     p.life-=dt*0.85;
@@ -1557,13 +1587,13 @@ function render(ts){
     p.x+=p.vx*dt*28;p.y+=p.vy*dt*28;
     const rad=60+(1-p.life)*110;
     const g=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,rad);
-    g.addColorStop(0,accentCSS(accentH+(1-p.life)*45,0.17*p.life));
+    g.addColorStop(0,accentCSS(accentH+(1-p.life)*45,Math.min(1,0.17*LB*p.life)));
     g.addColorStop(1,'rgba(0,0,0,0)');
     ctx.fillStyle=g;ctx.fillRect(p.x-rad,p.y-rad,rad*2,rad*2);
   }
   if(inSection){
     const g=ctx.createRadialGradient(mousePX,mousePY,0,mousePX,mousePY,130);
-    g.addColorStop(0,accentCSS(accentH,0.2));
+    g.addColorStop(0,accentCSS(accentH,0.2*LB));
     g.addColorStop(1,'rgba(0,0,0,0)');
     ctx.fillStyle=g;ctx.fillRect(mousePX-130,mousePY-130,260,260);
   }
@@ -1571,9 +1601,9 @@ function render(ts){
 
   // arc layout: cards arranged on a horizontal arc
   const arcR=W*0.75;          // radius of arc
-  const arcCY=H*0.42+arcR;    // arc center Y (far below viewport)
+  const arcCY=H*(PHONE?0.41:0.42)+arcR;    // arc center Y (far below viewport)
   const arcCX=W/2+mouseNX*W*0.04-W*0.02; // slight mouse parallax
-  const spread=0.085;          // radians between cards
+  const spread=PHONE?0.4:0.085;  // radians between cards (phones: wide enough that the neighbours peek out at the sides)
   const centerAngle=-Math.PI/2; // top of arc = center
 
   const angles=PROJECTS.map((_,i)=>centerAngle+(i-idx)*spread);
@@ -1714,6 +1744,7 @@ if(SEC&&wCursor){
 
 updateInfo(0);
 setInfoText(0);
+document.addEventListener('looper:theme',()=>{ resize(); _lastInfoIdx=-1; updateInfo(Math.max(0,lastIdx)); });
 })();
 
 /* Infinity loop background canvas */
